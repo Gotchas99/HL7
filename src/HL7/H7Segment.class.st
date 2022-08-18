@@ -39,14 +39,14 @@ H7Segment class >> on: aString config: aConf [
 H7Segment class >> segmentFromLine: aSegLine [
 
 	| code |
-	code := ($| split: aSegLine) first.
+	code := ($| split: aSegLine) first trimmed .
 	^ self allSubclasses detect: [ :c | c name = code ]ifNone:[Error signal: ('Not found segment:',code)]
 ]
 
 { #category : #'as yet unclassified' }
 H7Segment >> inspectionString [
 
-	<inspectorPresentationOrder: -10 title: 'nutool'>
+	<inspectorPresentationOrder: -10 title: 'HL7 Segment'>
 	^ SpTablePresenter new
 		  addColumn:
 			  ((SpStringTableColumn title: 'Index' evaluated: #first) width: 15);
@@ -76,7 +76,7 @@ H7Segment >> parse [
 H7Segment >> parseField: piece [
 
 	| tmp |
-	tmp := piece splitOn: $^.
+	tmp := piece trimmed splitOn: $^.
 	tmp size = 1
 		ifTrue: [ ^ tmp first ]
 		ifFalse: [ ^ tmp ].

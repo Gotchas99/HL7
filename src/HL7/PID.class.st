@@ -7,5 +7,7 @@ Class {
 { #category : #'field definition' }
 PID class >> fields [
 
-	^ #(8 'Administrative Sex'  )
+	^ #( 2 'Patient ID' 5 'Patient Name' 7 'Date/Time of Birth'
+	     8 'Administrative Sex' 9 'Patient Alias' 11 'Patient Address' 16 'Marital Status'
+	     23 'Birth Place' )
 ]
