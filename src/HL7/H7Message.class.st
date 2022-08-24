@@ -1,6 +1,9 @@
 Class {
 	#name : #H7Message,
 	#superclass : #H7Entity,
+	#instVars : [
+		'segments'
+	],
 	#category : #'HL7-Core'
 }
 
@@ -67,7 +70,7 @@ PV1||O|168 ~219~C~PMA^^^^^^^^^||||277^ALLEN MYLASTNAME^BONNIE^^^^|||||||||| ||26
 ]
 
 { #category : #'instance creation' }
-H7Message >> separators [
+H7Message class >> separators [
 "Segment Terminator <cr> - Terminates a segment record. This value cannot be 
 changed by implementers. 
 Field Separator | - Separates two adjacent data fields within a 
@@ -86,4 +89,9 @@ data (fourth) component of the ED data type. If no
 escape characters are used in a message, this 
 character may be omitted. However, it must be 
 present if subcomponents are used in the message"
+]
+
+{ #category : #'as yet unclassified' }
+H7Message >> segs:arrayOfSegments [
+segments :=arrayOfSegments 
 ]
