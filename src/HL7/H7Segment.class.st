@@ -16,7 +16,7 @@ H7Segment class >> fieldCat [
 ^fieldCat
 ]
 
-{ #category : #initialization }
+{ #category : #'field definition' }
 H7Segment class >> fields [
 
 	^#()
@@ -35,7 +35,7 @@ H7Segment class >> on: aString config: aConf [
 	^ self new on: aString config: aConf
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'instance creation' }
 H7Segment class >> segmentFromLine: aSegLine [
 
 	| code |

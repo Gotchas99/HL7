@@ -9,8 +9,8 @@ Class {
 	#category : #'HL7-Gui'
 }
 
-{ #category : #specs }
-H7PresenterMain class >> defaultSpec [
+{ #category : #layout }
+H7PresenterMain class >> defaultLayout [
 
 	^ SpBoxLayout newTopToBottom
 		  add: (SpBoxLayout newLeftToRight

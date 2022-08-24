@@ -23,6 +23,5 @@ H7App class >> run [
 { #category : #running }
 H7App >> start [
 
-	
-	(self new: H7PresenterMain) openWithSpec
+	(self new: H7PresenterMain) open
 ]
