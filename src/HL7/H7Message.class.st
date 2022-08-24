@@ -91,7 +91,22 @@ character may be omitted. However, it must be
 present if subcomponents are used in the message"
 ]
 
+{ #category : #accessing }
+H7Message >> at: anIndex [ 
+
+	^ segments at: anIndex 
+]
+
+{ #category : #accessing }
+H7Message >> at: anIndex ifAbsent: aBlock [
+^segments  at: anIndex ifAbsent: aBlock
+]
+
 { #category : #'as yet unclassified' }
 H7Message >> segs:arrayOfSegments [
 segments :=arrayOfSegments 
+]
+
+{ #category : #accessing }
+H7Message >> size [ ^segments size
 ]

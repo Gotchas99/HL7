@@ -76,10 +76,7 @@ H7Segment >> parse [
 H7Segment >> parseField: piece [
 
 	| tmp |
-	tmp := piece trimmed splitOn: $^.
-	tmp size = 1
-		ifTrue: [ ^ tmp first ]
-		ifFalse: [ ^ tmp ].
+	tmp := H7Field on: piece.
 	^ tmp
 ]
 

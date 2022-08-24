@@ -70,7 +70,10 @@ H7PresenterMain >> sampleMessages [
 
 	^ #( #( #sample1 'Sample message from web' )
 	     #( #adtA08 'exempel från Elin' )
-	     #( #adtA08_2 'sample från Göran' ) )
+	     #( #adtA08_2 'sample från Göran' )
+	     #( #adt40 'ADT 40 från Göran' ) #( #genack 'minimal ACK sample' )
+	#(#ormO01 'ORM 1')
+	#(#ormO01_2 'ORM O01 fr göran') )
 ]
 
 { #category : #accessing }
