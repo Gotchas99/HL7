@@ -11,12 +11,12 @@ Class {
 MSH class >> fields [
 
 	^ #( 1 'Field separator' 2 'Encoding characters'
-	     3 'Sending Application' 
-	4 'Sending Facility'
-	5 'Receiving Application'
-	6  'Receiving Facility'
-	7 'Date/Time of Message'
-	     9 'Message Type' 10 'Message Control Id' 11 'Processing Id' 12 'Version Id' 18 'Character Set')
+	     3 'Sending Application' 4 'Sending Facility' 5 'Receiving Application'
+	     6 'Receiving Facility' 7 'Date/Time of Message'
+	     9 'Message Type' 10 'Message Control Id' 11 'Processing Id'
+	     12 'Version Id' 15 'Accept Acknowledgement Type'
+	     16 'Application Acknowledgement Type'
+	     18 'Character Set' 21 'Message Profile Identifier')
 ]
 
 { #category : #parsing }

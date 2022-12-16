@@ -16,9 +16,9 @@ H7PresenterMain class >> defaultLayout [
 		  add: (SpBoxLayout newLeftToRight
 				   add: #msgs;
 				   add: #segs expand: true)
-		  height: 150;
+		  height: 165;
 		  add: #flds expand: true;
-				  yourself
+		  yourself
 ]
 
 { #category : #initialization }
@@ -71,9 +71,10 @@ H7PresenterMain >> sampleMessages [
 	^ #( #( #sample1 'Sample message from web' )
 	     #( #adtA08 'exempel från Elin' )
 	     #( #adtA08_2 'sample från Göran' )
-	     #( #adt40 'ADT 40 från Göran' ) #( #genack 'minimal ACK sample' )
-	#(#ormO01 'ORM 1')
-	#(#ormO01_2 'ORM O01 fr göran') )
+	     #( #adtA40 'ADT 40 från Göran' )
+	     #( #genack 'minimal ACK sample' )
+	     #( #ormO01 'ORM 1' ) #( #ormO01_2 'ORM O01 fr göran' )
+	     #( #ormO01_3 'ORM från qaelum' )  #( #spot 'Connex Spot' ) )
 ]
 
 { #category : #accessing }
