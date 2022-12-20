@@ -68,13 +68,14 @@ H7PresenterMain >> initializePresenters [
 { #category : #initialization }
 H7PresenterMain >> sampleMessages [
 
-	^ #( #( #sample1 'Sample message from web' )
+	^ #( #( #pcd15 'PCD 15 sample' )#( #sample1 'Sample message from web' )
 	     #( #adtA08 'exempel från Elin' )
 	     #( #adtA08_2 'sample från Göran' )
 	     #( #adtA40 'ADT 40 från Göran' )
 	     #( #genack 'minimal ACK sample' )
 	     #( #ormO01 'ORM 1' ) #( #ormO01_2 'ORM O01 fr göran' )
-	     #( #ormO01_3 'ORM från qaelum' )  #( #spot 'Connex Spot' ) )
+	     #( #ormO01_3 'ORM från qaelum' )
+	     #( #spot 'Connex Spot' ) )
 ]
 
 { #category : #accessing }
