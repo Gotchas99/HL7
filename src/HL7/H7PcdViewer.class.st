@@ -59,14 +59,18 @@ H7PcdViewer >> initializePresenters [
 		beResizable;
 		activateOnDoubleClick;
 		whenActivatedDo: [ :selection | 
-			selection selectedItem isMetric
-				ifTrue: [ selection selectedItem inspect ]
+			| item |
+			item := selection selectedItem.
+			item isMetric
+				ifTrue: [ item inspect ]
 				ifFalse: [ 
-									ad := tree1 adapter.
+					ad := tree1 adapter.
 					path := ad selectedPath.
-					(ad isExpanded: path)
-						ifTrue: [ ad collapsePath: path ]
-						ifFalse: [ ad expandPath: path ] ] ]
+									(ad isExpanded: item)
+						ifTrue: [ 
+													ad collapsePath: path ]
+						ifFalse: [ 
+													ad expandPath: path ] ] ]
 ]
 
 { #category : #accessing }

@@ -83,7 +83,13 @@ H7PresenterMain >> msgMenu [
 				  action: [ 
 					  | txt |
 					  txt := H7Message perform: msgs selectedItem first.
-					  H7PcdViewer openOn: (H7Parser on: txt) parse ] ]
+					  H7PcdViewer openOn: (H7Parser on: txt) parse ] ];
+		  addItem: [ :anItem | 
+			  anItem
+				  name: 'Öppna som text';
+				  action: [ 
+					  | txt |
+					  txt := H7Message perform: msgs selectedItem first.StPlayground openContents:txt ] ]
 ]
 
 { #category : #initialization }

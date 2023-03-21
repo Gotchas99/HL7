@@ -10,7 +10,7 @@ Class {
 { #category : #'instance creation' }
 NmVMD >> from: aPcd [
 	super from: aPcd.
-	eq := aPcd eq at: 1
+	"eq := aPcd eq at: 1"
 ]
 
 { #category : #accessing }
