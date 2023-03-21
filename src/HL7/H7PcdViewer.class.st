@@ -33,9 +33,6 @@ H7PcdViewer >> initialExtent [
 { #category : #initialization }
 H7PcdViewer >> initializePresenters [
 
-	"self halt."
-
-	| path ad |
 	tree1 := self newTreeTable.
 	tree1
 		addColumn:
@@ -58,19 +55,7 @@ H7PcdViewer >> initializePresenters [
 		children: [ :x | x nodes ];
 		beResizable;
 		activateOnDoubleClick;
-		whenActivatedDo: [ :selection | 
-			| item |
-			item := selection selectedItem.
-			item isMetric
-				ifTrue: [ item inspect ]
-				ifFalse: [ 
-					ad := tree1 adapter.
-					path := ad selectedPath.
-									(ad isExpanded: item)
-						ifTrue: [ 
-													ad collapsePath: path ]
-						ifFalse: [ 
-													ad expandPath: path ] ] ]
+		whenActivatedDo: [ :selection | self toggleNode: selection ]
 ]
 
 { #category : #accessing }
@@ -78,4 +63,19 @@ H7PcdViewer >> msg: aH7Msg [
 h7:=aH7Msg.
 	pcd := PcdMessage from: h7.
 	iso := pcd mds.tree1 roots:{iso}
+]
+
+{ #category : #initialization }
+H7PcdViewer >> toggleNode: selection [
+
+	| ad path item |
+	item := selection selectedItem.
+	 item isMetric
+		  ifTrue: [ item inspect ]
+		  ifFalse: [ 
+			  ad := tree1 adapter.
+			  path := ad selectedPath.
+			  (ad isExpanded: item)
+				  ifTrue: [ ad collapsePath: path ]
+				  ifFalse: [ ad expandPath: path ] ]
 ]
