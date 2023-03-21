@@ -217,6 +217,12 @@ H7Message >> size [ ^segments size
 ]
 
 { #category : #accessing }
+H7Message >> text [ ^
+
+	text 
+]
+
+{ #category : #accessing }
 H7Message >> text: txt [
 text:=txt
 ]
