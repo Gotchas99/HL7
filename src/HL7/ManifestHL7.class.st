@@ -9,7 +9,7 @@ Class {
 
 { #category : #'code-critics' }
 ManifestHL7 class >> ruleBadMessageRule2V1FalsePositive [
-	^ #(#(#(#RGMethodDefinition #(#H7PresenterMain #connectPresenters #false)) #'2022-08-18T15:32:23.172+02:00') )
+	^ #(#(#(#RGMethodDefinition #(#H7PresenterMain #connectPresenters #false)) #'2022-08-18T15:32:23.172+02:00') #(#(#RGMethodDefinition #(#H7PresenterMain #msgMenu #false)) #'2023-02-13T10:07:54.054+01:00') )
 ]
 
 { #category : #'code-critics' }

@@ -1,9 +1,6 @@
 Class {
 	#name : #MSH,
 	#superclass : #H7Segment,
-	#instVars : [
-		'fs'
-	],
 	#category : #'HL7-Core'
 }
 
@@ -17,6 +14,14 @@ MSH class >> fields [
 	     12 'Version Id' 15 'Accept Acknowledgement Type'
 	     16 'Application Acknowledgement Type'
 	     18 'Character Set' 21 'Message Profile Identifier')
+]
+
+{ #category : #testing }
+MSH >> isPCD [
+
+	| fld |
+	fld := (self at: 21 ifAbsent: [ ^ false ]) third.
+	^fld isPCD
 ]
 
 { #category : #parsing }
@@ -33,4 +38,12 @@ MSH >> parseFields: pieces [
 		fld := self class fieldCat at: index ifAbsent: [ '***' ].
 		       Array with: index with: fld with: each third ].
 	^ tmp
+]
+
+{ #category : #testing }
+MSH >> profileOid [
+
+	| fld |
+	fld := (self at: 21) third.
+	^ fld at:3
 ]

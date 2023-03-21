@@ -3,7 +3,8 @@ Class {
 	#superclass : #H7Entity,
 	#instVars : [
 		'txt',
-		'config'
+		'config',
+		'fields'
 	],
 	#classInstVars : [
 		'fieldCat'
@@ -43,7 +44,24 @@ H7Segment class >> segmentFromLine: aSegLine [
 	^ self allSubclasses detect: [ :c | c name = code ]ifNone:[Error signal: ('Not found segment:',code)]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
+H7Segment >> at:anIndex [
+^fields at: anIndex 
+]
+
+{ #category : #accessing }
+H7Segment >> at: anIndex ifAbsent: aBlock [
+
+	^ fields at: anIndex ifAbsent: aBlock
+]
+
+{ #category : #accessing }
+H7Segment >> fields [
+
+	^ fields 
+]
+
+{ #category : #inspecting }
 H7Segment >> inspectionString [
 
 	<inspectorPresentationOrder: -10 title: 'HL7 Segment'>
@@ -83,11 +101,16 @@ H7Segment >> parseField: piece [
 { #category : #'instance creation' }
 H7Segment >> parseFields: pieces [
 
-	| tmp fld |
-	tmp := pieces allButFirst withIndexCollect: [ :each :index | 
-		       fld := self class fieldCat at: index ifAbsent: [ '***' ].
-		       Array with: index with: fld with: (self parseField: each) ].
-	^ tmp 
+	|  fld |
+	fields := pieces allButFirst withIndexCollect: [ :each :index | 
+		          fld := self class fieldCat at: index ifAbsent: [ '***' ].
+		          Array with: index with: fld with: (self parseField: each) ].
+	^ fields
+]
+
+{ #category : #accessing }
+H7Segment >> segType [
+^self class name
 ]
 
 { #category : #accessing }

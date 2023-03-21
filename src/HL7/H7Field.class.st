@@ -15,6 +15,34 @@ H7Field class >> on: aString [
 ]
 
 { #category : #'instance creation' }
+H7Field >> at: anIndex [
+
+	^ comps at: anIndex
+
+
+]
+
+{ #category : #'instance creation' }
+H7Field >> at: anIndex  ifAbsent: aBlock [
+
+	^ comps at: anIndex  ifAbsent: aBlock
+]
+
+{ #category : #'instance creation' }
+H7Field >> isEmpty [
+
+	^ comps isEmpty or:[comps first isEmpty]
+]
+
+{ #category : #testing }
+H7Field >> isPCD [
+
+	| issuer |
+	issuer := self at: 2.
+	^ issuer = 'IHE PCD' or: [ ^ issuer = 'IHE_PCD' ] 
+]
+
+{ #category : #'instance creation' }
 H7Field >> on: aString [
 
 	txt := aString trimmed.
@@ -30,4 +58,10 @@ H7Field >> printOn: aStream [
 	"	tmp size = 1
 		ifTrue: [ ^ tmp first ]
 		ifFalse: [ ^ tmp ]."
+]
+
+{ #category : #accessing }
+H7Field >> value [
+
+	^ comps at: 3
 ]

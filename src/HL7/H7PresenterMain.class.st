@@ -38,7 +38,7 @@ H7PresenterMain >> connectPresenters [
 { #category : #'accessing - resources' }
 H7PresenterMain >> initialExtent [
 
-	^ 800 @ 800
+	^ 800 @ 900
 ]
 
 { #category : #initialization }
@@ -47,11 +47,12 @@ H7PresenterMain >> initializePresenters [
 	msgs := self newTable.
 	msgs
 		beResizable;
+				 contextMenu: self msgMenu;
 		addColumn:
-			((SpStringTableColumn title: 'Selector' evaluated: #first) width:
-					 25);
+			((SpStringTableColumn title: 'Selector' evaluated: #first)
+				 width: 25);
 		addColumn:
-			(SpStringTableColumn title: 'Description' evaluated: #second);
+		(SpStringTableColumn title: 'Description' evaluated: #second);
 		items: self sampleMessages.
 	segs := self newList.
 	flds := SpTablePresenter new
@@ -66,9 +67,31 @@ H7PresenterMain >> initializePresenters [
 ]
 
 { #category : #initialization }
+H7PresenterMain >> msgMenu [
+
+	^ self newMenu
+		  addItem: [ :anItem | 
+			  anItem
+				  name: 'Inspect';
+				  action: [ 
+					  | txt |
+					  txt := H7Message perform: msgs selectedItem first.
+					  (H7Parser on: txt) parse inspect ] ];
+		  addItem: [ :anItem | 
+			  anItem
+				  name: 'Öppna som PCD';
+				  action: [ 
+					  | txt |
+					  txt := H7Message perform: msgs selectedItem first.
+					  H7PcdViewer openOn: (H7Parser on: txt) parse ] ]
+]
+
+{ #category : #initialization }
 H7PresenterMain >> sampleMessages [
 
-	^ #( #( #pcd15 'PCD 15 sample' )#( #sample1 'Sample message from web' )
+	^ #( #( #pcd01_episode 'PCD Episodic' )
+	     #( #pcd01_physMon 'PCD 01 Physical monitor' ) #( #pcd15 'PCD 15 sample' )
+	     #( #sample1 'Sample message from web' )
 	     #( #adtA08 'exempel från Elin' )
 	     #( #adtA08_2 'sample från Göran' )
 	     #( #adtA40 'ADT 40 från Göran' )

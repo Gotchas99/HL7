@@ -42,5 +42,5 @@ H7Parser >> parse [
 		        | segType |
 		        segType := H7Segment segmentFromLine: segLine.
 		        segType on: segLine config: conf ].
-	^ H7Message new segs: segs
+	^ H7Message new text:txt; segs: segs
 ]
