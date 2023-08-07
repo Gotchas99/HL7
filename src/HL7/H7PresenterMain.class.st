@@ -2,6 +2,7 @@ Class {
 	#name : #H7PresenterMain,
 	#superclass : #SpPresenterWithModel,
 	#instVars : [
+		'categories',
 		'msgs',
 		'segs',
 		'flds'
@@ -14,6 +15,7 @@ H7PresenterMain class >> defaultLayout [
 
 	^ SpBoxLayout newTopToBottom
 		  add: (SpBoxLayout newLeftToRight
+		add:#categories;
 				   add: #msgs;
 				   add: #segs expand: true)
 		  height: 165;
@@ -24,36 +26,53 @@ H7PresenterMain class >> defaultLayout [
 { #category : #initialization }
 H7PresenterMain >> connectPresenters [
 
-	| sel txt |
-	msgs whenSelectionChangedDo: [ :selection | 
+	| sel txt tmp |
+	categories whenSelectionChangedDo: [ :selection | 
 		[ :elem | 
 		sel := elem first.
-		txt := H7Message perform: sel.
-		segs items: (H7Parser on: txt) parse ] cull: selection selectedItem ].
+		tmp := self sampleMessages select: [ :m | m third = sel ].
+		msgs items: tmp ] cull: selection selectedItem ].
+	msgs whenSelectionChangedDo: [ :selection | 
+		[ :elem | 
+		elem ifNil: [ segs items: #(  ) ] ifNotNil: [ 
+			sel := elem first.
+			txt := H7Message perform: sel.
+			segs items: (H7Parser on: txt) parse ] ] cull:
+			selection selectedItem ].
 	segs whenSelectionChangedDo: [ :selection | 
-		[ :elem | elem ifNotNil: [ flds items: elem parse] ] cull:
+		[ :elem | elem ifNil:[flds items:#()] ifNotNil: [ flds items: elem parse ] ] cull:
 			selection selectedItem ]
 ]
 
 { #category : #'accessing - resources' }
 H7PresenterMain >> initialExtent [
 
-	^ 800 @ 900
+	^ 900 @ 900
 ]
 
 { #category : #initialization }
 H7PresenterMain >> initializePresenters [
 
+	categories := self newTable.
+	categories
+		beResizable;
+		contextMenu: self msgMenu;
+		addColumn:
+			((SpStringTableColumn title: 'Selector' evaluated: #first) width:
+					 25);
+		addColumn:
+			(SpStringTableColumn title: 'Description' evaluated: #second);
+		items: self sampleCategories.
 	msgs := self newTable.
 	msgs
 		beResizable;
-				 contextMenu: self msgMenu;
+		contextMenu: self msgMenu;
 		addColumn:
-			((SpStringTableColumn title: 'Selector' evaluated: #first)
-				 width: 25);
+			((SpStringTableColumn title: 'Selector' evaluated: #first) width:
+					 25);
 		addColumn:
-		(SpStringTableColumn title: 'Description' evaluated: #second);
-		items: self sampleMessages.
+			(SpStringTableColumn title: 'Description' evaluated: #second)
+	.
 	segs := self newList.
 	flds := SpTablePresenter new
 		        addColumn:
@@ -64,6 +83,22 @@ H7PresenterMain >> initializePresenters [
 		        addColumn:
 			        (SpStringTableColumn title: 'Value' evaluated: #last);
 		        yourself
+]
+
+{ #category : #initialization }
+H7PresenterMain >> initializeWindow: aWindowPresenter [
+
+	"override this to set window values before opening. 
+	 You may want to add a menu, a toolbar or a statusbar"
+
+	"IMPORTANT: Please ovirride this method and set yourself the informations you want in your window.
+	The content of this method is here to help the transition between Spec 1 and 2.
+	In the next Spec version the content of this method will be removed and it will do nothing by default because the goal is to remove the management of all of those informations from Composable to put them in WindowPresenter."
+
+	aWindowPresenter
+		title: self title;
+		initialExtent: self initialExtent
+		"windowIcon: self windowIcon"
 ]
 
 { #category : #initialization }
@@ -93,18 +128,28 @@ H7PresenterMain >> msgMenu [
 ]
 
 { #category : #initialization }
+H7PresenterMain >> sampleCategories [
+
+	^ #( #( #covid 'COVID' ) #( #dose 'ORM från qaelum' )#( #goran 'Samples from Göran' )
+	     #( #misc 'various samples' ) 
+	     #( #pcd 'PCD Samples' ) )
+]
+
+{ #category : #initialization }
 H7PresenterMain >> sampleMessages [
 
-	^ #( #( #pcd01_episode 'PCD Episodic' )
-	     #( #pcd01_physMon 'PCD 01 Physical monitor' ) #( #pcd15 'PCD 15 sample' )
-	     #( #sample1 'Sample message from web' )
-	     #( #adtA08 'exempel från Elin' )
-	     #( #adtA08_2 'sample från Göran' )
-	     #( #adtA40 'ADT 40 från Göran' )
-	     #( #genack 'minimal ACK sample' )
-	     #( #ormO01 'ORM 1' ) #( #ormO01_2 'ORM O01 fr göran' )
-	     #( #ormO01_3 'ORM från qaelum' )
-	     #( #spot 'Connex Spot' ) )
+	^ #( #( #covid01 'COVID lab request' 'covid' )
+	     #( #pcd01_episode 'PCD Episodic' 'pcd' )
+	     #( #pcd01_physMon 'PCD 01 Physical monitor'
+	        'pcd' ) #( #pcd15 'PCD 15 sample' 'pcd' )
+	     #( #sample1 'Sample message from web' 'misc' )
+	     #( #adtA08 'exempel från Elin' 'misc' )
+	     #( #adtA08_2 'sample från Göran' 'goran' )
+	     #( #adtA40 'ADT 40 från Göran' 'goran' )
+	     #( #genAck 'minimal ACK sample' 'misc' )
+	     #( #ormO01 'ORM 1' 'misc' ) #( #ormO01_2 'ORM O01 fr göran'
+	        'goran' ) #( #ormO01_3 'ORM från qaelum' 'dose' )
+	     #( #spot 'Connex Spot' 'pcd' ) )
 ]
 
 { #category : #accessing }

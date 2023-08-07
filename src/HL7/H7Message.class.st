@@ -33,6 +33,21 @@ H7Message class >> adtA40 [
 ]
 
 { #category : #samples }
+H7Message class >> covid01 [
+
+	^ 'MSH|^~\&|Lab_A|LABLAB_ORDEREXPORT^83461669998^EHEALTHBOX|Lab_C|LABLAB_ORDEREXPORT^71067049000^EHEALTHBOX|20200910052450||OML^O21|000001519692|P|2.5|||NE|AL||8859/15
+PID|1||60120831909^^^INSZ||Test&&Test^Bart^^^^^L||19601208|M|||Sluisweg 2A^^Gent^^9000^BE||09/2202321^^PH^^^^^^^^^09/2202321~0485554528^^CP^^^^^^^^^0485554528~^NET^Internet^Bart.Test@telenet.be||||||||||Gent|N||||||N
+ORC|NW|M0907607^L|||IP||^^^20200908113600^^R||20200910052450|||14776761^Zivago&&Zivago^Andre^^^^DR.^hcpr^RIZIV|83461669998^^^^^^^^^^EHEALTHBOXTQ1|||||||20200908113600||R
+OBR|1|M0907607^L||CORONA_TPR^Test prescription reason^L^TP-CODE^Test prescription reason^LN|||20200908113600|||||||20200908094100||||||||20200914074414|||F||^^^20200908113600^^R
+OBX|1|ST| CORONA_TPR^Test prescription reason^L^TP-CODE^Test prescription reason^LN||TP0110|||N|||F|||20200908113600
+ORC|NW|M0907607^L|||IP||^^^20200908113600^^R||20200910052450|||14776761^Zivago&&Zivago^Andre^^^^DR.^hcpr^RIZIV|83461669998^^^^^^^^^^EHEALTHBOX 
+TQ1|||||||20200908113600||R
+OBR|1|M0907607^L||PCRCovid^PCR Covid^L^94309-2^ PCR Covid ^LN|||20200908113600|||||||20200908094100||||||||20200910052450|||||^^^20200908113600^^R
+SPM|1|ZZ00Z02342&Barcode||ESWAB^E-swab^L^258500001^Eswab^SCT||||||||0^mL&mL&L|||||20200908113600|2020090811363||N
+OBX|1|CE||1'
+]
+
+{ #category : #samples }
 H7Message class >> genAck [
 
 	^ 'MSH|^~\&|LAB|767543|ADT|767543|19900314130405||ACK^A08^ACK|XX3657|P|2.5
@@ -196,7 +211,7 @@ H7Message >> at: anIndex ifAbsent: aBlock [
 H7Message >> isPCD [ ^self msh isPCD
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 H7Message >> msh [
 ^segments at: 1
 ]
