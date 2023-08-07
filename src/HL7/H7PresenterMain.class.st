@@ -32,9 +32,10 @@ H7PresenterMain >> connectPresenters [
 		[ :elem | 
 		elem ifNil: [ flds items: #(  ) ] ifNotNil: [ 
 			tmp := elem parse.
-						chkEmpties state ifFalse: [ 
+			chkEmpties state ifFalse: [ 
 				tmp := tmp reject: [ :arr | arr last isEmpty ] ].
-			flds items: tmp ] ] cull: selection selectedItem ]
+			flds items: tmp ] ] cull: selection selectedItem ].
+	buttonReload action: [ self reload ]
 ]
 
 { #category : #layout }
@@ -138,6 +139,13 @@ H7PresenterMain >> msgMenu [
 				  action: [ 
 					  | txt |
 					  txt := H7Message perform: msgs selectedItem first.StPlayground openContents:txt ] ]
+]
+
+{ #category : #initialization }
+H7PresenterMain >> reload [
+
+	H7App run.
+	self delete
 ]
 
 { #category : #samples }
