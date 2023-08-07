@@ -144,6 +144,7 @@ H7PresenterMain >> msgMenu [
 { #category : #initialization }
 H7PresenterMain >> reload [
 
+H7Segment  initialize.
 	H7App run.
 	self delete
 ]
