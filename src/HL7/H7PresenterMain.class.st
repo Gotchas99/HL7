@@ -5,23 +5,12 @@ Class {
 		'categories',
 		'msgs',
 		'segs',
-		'flds'
+		'flds',
+		'buttonReload',
+		'chkEmpties'
 	],
 	#category : #'HL7-Gui'
 }
-
-{ #category : #layout }
-H7PresenterMain class >> defaultLayout [
-
-	^ SpBoxLayout newTopToBottom
-		  add: (SpBoxLayout newLeftToRight
-		add:#categories;
-				   add: #msgs;
-				   add: #segs expand: true)
-		  height: 165;
-		  add: #flds expand: true;
-		  yourself
-]
 
 { #category : #initialization }
 H7PresenterMain >> connectPresenters [
@@ -40,8 +29,29 @@ H7PresenterMain >> connectPresenters [
 			segs items: (H7Parser on: txt) parse ] ] cull:
 			selection selectedItem ].
 	segs whenSelectionChangedDo: [ :selection | 
-		[ :elem | elem ifNil:[flds items:#()] ifNotNil: [ flds items: elem parse ] ] cull:
-			selection selectedItem ]
+		[ :elem | 
+		elem ifNil: [ flds items: #(  ) ] ifNotNil: [ 
+			tmp := elem parse.
+						chkEmpties state ifFalse: [ 
+				tmp := tmp reject: [ :arr | arr last isEmpty ] ].
+			flds items: tmp ] ] cull: selection selectedItem ]
+]
+
+{ #category : #layout }
+H7PresenterMain >> defaultLayout [
+
+	^ SpBoxLayout newTopToBottom
+		  add: (SpBoxLayout newLeftToRight
+				   add: #buttonReload;
+				   add: #chkEmpties)
+		  height: 25;
+		  add: (SpBoxLayout newLeftToRight
+				   add: #categories;
+				   add: #msgs;
+				   add: #segs expand: true)
+		  height: 165;
+		  add: #flds expand: true;
+		  yourself
 ]
 
 { #category : #'accessing - resources' }
@@ -71,8 +81,7 @@ H7PresenterMain >> initializePresenters [
 			((SpStringTableColumn title: 'Selector' evaluated: #first) width:
 					 25);
 		addColumn:
-			(SpStringTableColumn title: 'Description' evaluated: #second)
-	.
+			(SpStringTableColumn title: 'Description' evaluated: #second).
 	segs := self newList.
 	flds := SpTablePresenter new
 		        addColumn:
@@ -82,7 +91,11 @@ H7PresenterMain >> initializePresenters [
 			        (SpStringTableColumn title: 'Field' evaluated: #second);
 		        addColumn:
 			        (SpStringTableColumn title: 'Value' evaluated: #last);
-		        yourself
+		        yourself.
+	buttonReload := self newButton label: 'Reload'.
+	chkEmpties := self newCheckBox
+		              label: 'Show empty fields';
+		              state: true
 ]
 
 { #category : #initialization }
@@ -127,7 +140,7 @@ H7PresenterMain >> msgMenu [
 					  txt := H7Message perform: msgs selectedItem first.StPlayground openContents:txt ] ]
 ]
 
-{ #category : #initialization }
+{ #category : #samples }
 H7PresenterMain >> sampleCategories [
 
 	^ #( #( #covid 'COVID' ) #( #dose 'ORM från qaelum' )#( #goran 'Samples from Göran' )
@@ -135,7 +148,7 @@ H7PresenterMain >> sampleCategories [
 	     #( #pcd 'PCD Samples' ) )
 ]
 
-{ #category : #initialization }
+{ #category : #samples }
 H7PresenterMain >> sampleMessages [
 
 	^ #( #( #covid01 'COVID lab request' 'covid' )
