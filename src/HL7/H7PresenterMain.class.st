@@ -34,14 +34,26 @@ H7PresenterMain >> connectPresenters [
 			tmp := elem parse.
 			chkEmpties state ifFalse: [ 
 				tmp := tmp reject: [ :arr | arr last isEmpty ] ].
-			flds items: tmp ] ] cull: selection selectedItem ].
-	buttonReload action: [ self reload ]
+			flds items: tmp ] ] cull: selection selectedItem ]
+.buttonReload action: [ self reload ]
 ]
 
 { #category : #layout }
 H7PresenterMain >> defaultLayout [
 
-	^ SpBoxLayout newTopToBottom
+	^ SpPanedLayout newTopToBottom
+		  add: (SpBoxLayout newTopToBottom
+				   add: (SpBoxLayout newLeftToRight
+						    add: #buttonReload;
+						    add: #chkEmpties)
+				   height: 25;
+				   add: (SpBoxLayout newLeftToRight
+						    add: #categories;
+						    add: #msgs;
+						    add: #segs expand: true));
+		  add: #flds;
+		  positionOfSlider: 180; yourself
+	"SpBoxLayout newTopToBottom
 		  add: (SpBoxLayout newLeftToRight
 				   add: #buttonReload;
 				   add: #chkEmpties)
@@ -52,7 +64,7 @@ H7PresenterMain >> defaultLayout [
 				   add: #segs expand: true)
 		  height: 165;
 		  add: #flds expand: true;
-		  yourself
+		  yourself"
 ]
 
 { #category : #'accessing - resources' }
@@ -67,7 +79,6 @@ H7PresenterMain >> initializePresenters [
 	categories := self newTable.
 	categories
 		beResizable;
-		contextMenu: self msgMenu;
 		addColumn:
 			((SpStringTableColumn title: 'Selector' evaluated: #first) width:
 					 25);
@@ -93,10 +104,12 @@ H7PresenterMain >> initializePresenters [
 		        addColumn:
 			        (SpStringTableColumn title: 'Value' evaluated: #last);
 		        yourself.
-	buttonReload := self newButton label: 'Reload'.
+	buttonReload := self newButton
+		                label: 'Reload';
+		                action: [ self reload ].
 	chkEmpties := self newCheckBox
 		              label: 'Show empty fields';
-		              state: true
+		              state: false
 ]
 
 { #category : #initialization }
@@ -170,8 +183,9 @@ H7PresenterMain >> sampleMessages [
 	     #( #adtA40 'ADT 40 från Göran' 'goran' )
 	     #( #genAck 'minimal ACK sample' 'misc' )
 	     #( #ormO01 'ORM 1' 'misc' ) #( #ormO01_2 'ORM O01 fr göran'
-	        'goran' ) #( #ormO01_3 'ORM från qaelum' 'dose' )
-	     #( #spot 'Connex Spot' 'pcd' ) )
+	        'goran' ) #( #ormO01_3 'ORM från qaelum - 2D X-ray'
+	        'dose' ) #( #ormO01_4 'ORM från qaelum - mammography'
+	        'dose' ) #( #ormO01_5 'ORM från qaelum - CT' 'dose' ) #( #spot 'Connex Spot' 'pcd' ) )
 ]
 
 { #category : #accessing }
