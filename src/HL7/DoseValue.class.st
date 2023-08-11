@@ -31,10 +31,10 @@ DoseValue >> from: anObxMsg [
 	subId := ((anObxMsg at: 4) at: 3) at: 1.
 	value := ((anObxMsg at: 5) at: 3) value.
 	unit := ((anObxMsg at: 6) at: 3) value.
-	refRange := ((anObxMsg at: 7) at: 3)value.
+	refRange := ((anObxMsg at: 7) at: 3) value.
 	"HH: Above upper panic limits"
 	alertFlags := ((anObxMsg at: 8) at: 3) value.
-	obsTime := ((anObxMsg at: 14) at: 3) value.
+	obsTime :=DateAndTime readYMDHMSfromDigits: ((anObxMsg at: 14) at: 3) value readStream.
 	uidFld := (anObxMsg at: 17) at: 3.
 	uid := uidFld at: 2.
 	uidType := (uidFld at: 1) = '110180'
