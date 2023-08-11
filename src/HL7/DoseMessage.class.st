@@ -14,7 +14,7 @@ Class {
 { #category : #'instance creation' }
 DoseMessage >> alertsFrom: dict [
 
-	^(dict at:'')collect:[:a| DoseAlert new from:a]
+	^ (dict at: '' ifAbsent:[#()]) collect: [ :a | DoseAlert new from: a ]
 ]
 
 { #category : #'instance creation' }
@@ -22,7 +22,7 @@ DoseMessage >> from: aH7Msg [
 
 	| obxs vals |
 	aH7Msg sendingApplication = 'TQMDOSE' ifFalse: [ 
-		self error: 'Not a Dose message' ].
+		self error: 'Not a Dose message' ]. 
 	h7 := aH7Msg.
 	obxs := h7 segments select: [ :seg | seg segType = 'OBX' ].
 	vals := obxs collect: [ :o | DoseValue new from: o ].
@@ -31,11 +31,11 @@ DoseMessage >> from: aH7Msg [
 		| arr |
 		arr := subIds at: v subId ifAbsentPut: OrderedCollection new.
 		arr add: v ].
-		self halt.
-	study :=self studyFrom: subIds  .
-	study addFromOBR: ( h7 segments detect: [ :seg | seg segType = 'OBR' ]).
-	series:=self seriesFrom: subIds.
-	alerts :=self alertsFrom: subIds .
+	study := self studyFrom: subIds.
+	study addFromOBR:
+		(h7 segments detect: [ :seg | seg segType = 'OBR' ]).
+	series := self seriesFrom: subIds.
+	alerts := self alertsFrom: subIds.
 	self inspect
 ]
 
