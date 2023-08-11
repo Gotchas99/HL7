@@ -14,7 +14,7 @@ H7Field class >> on: aString [
 	^ self new on: aString
 ]
 
-{ #category : #'instance creation' }
+{ #category : #accessing }
 H7Field >> at: anIndex [
 
 	^ comps at: anIndex
@@ -22,16 +22,21 @@ H7Field >> at: anIndex [
 
 ]
 
-{ #category : #'instance creation' }
+{ #category : #accessing }
 H7Field >> at: anIndex  ifAbsent: aBlock [
 
 	^ comps at: anIndex  ifAbsent: aBlock
 ]
 
-{ #category : #'instance creation' }
+{ #category : #accessing }
+H7Field >> first [
+^self at:1
+]
+
+{ #category : #testing }
 H7Field >> isEmpty [
 
-	^ comps isEmpty or:[comps first isEmpty]
+	^ comps isEmpty or: [ comps first isEmpty ]
 ]
 
 { #category : #testing }
@@ -40,6 +45,12 @@ H7Field >> isPCD [
 	| issuer |
 	issuer := self at: 2.
 	^ issuer = 'IHE PCD' or: [ ^ issuer = 'IHE_PCD' ] 
+]
+
+{ #category : #accessing }
+H7Field >> last [
+
+	^ self at: self size
 ]
 
 { #category : #'instance creation' }
@@ -63,5 +74,5 @@ H7Field >> printOn: aStream [
 { #category : #accessing }
 H7Field >> value [
 
-	^ comps at: 3
+	^ comps  last
 ]

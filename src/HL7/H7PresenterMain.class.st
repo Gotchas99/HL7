@@ -34,8 +34,8 @@ H7PresenterMain >> connectPresenters [
 			tmp := elem parse.
 			chkEmpties state ifFalse: [ 
 				tmp := tmp reject: [ :arr | arr last isEmpty ] ].
-			flds items: tmp ] ] cull: selection selectedItem ]
-.buttonReload action: [ self reload ]
+			flds items: tmp ] ] cull: selection selectedItem ]; whenActivatedDo: [ :it | it selectedItem inspect ].
+	flds whenActivatedDo: [ :it | it selectedItem inspect ]
 ]
 
 { #category : #layout }
@@ -95,7 +95,7 @@ H7PresenterMain >> initializePresenters [
 		addColumn:
 			(SpStringTableColumn title: 'Description' evaluated: #second).
 	segs := self newList.
-	flds := SpTablePresenter new
+	flds :=self newTable
 		        addColumn:
 			        ((SpStringTableColumn title: 'Index' evaluated: #first) 
 				         width: 15);
@@ -148,10 +148,18 @@ H7PresenterMain >> msgMenu [
 					  H7PcdViewer openOn: (H7Parser on: txt) parse ] ];
 		  addItem: [ :anItem | 
 			  anItem
+				  name: 'Öppna som DOSE output';
+				  action: [ 
+					  | txt |
+					  txt := H7Message perform: msgs selectedItem first.
+					( DoseMessage new from: ((H7Parser on: txt) parse)) inspect ] ];
+		  addItem: [ :anItem | 
+			  anItem
 				  name: 'Öppna som text';
 				  action: [ 
 					  | txt |
-					  txt := H7Message perform: msgs selectedItem first.StPlayground openContents:txt ] ]
+					  txt := H7Message perform: msgs selectedItem first.
+					  StPlayground openContents: txt ] ]
 ]
 
 { #category : #initialization }

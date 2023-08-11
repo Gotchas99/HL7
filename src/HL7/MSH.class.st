@@ -24,6 +24,12 @@ MSH >> isPCD [
 	^fld isPCD
 ]
 
+{ #category : #testing }
+MSH >> msgType [
+
+	^ (self at: 9) last at: 3
+]
+
 { #category : #parsing }
 MSH >> parseFields: pieces [
 
@@ -46,4 +52,10 @@ MSH >> profileOid [
 	| fld |
 	fld := (self at: 21) third.
 	^ fld at:3
+]
+
+{ #category : #testing }
+MSH >> sendingApplication [
+
+	^ (self at: 3)  last at:1
 ]

@@ -13,6 +13,16 @@ ManifestHL7 class >> ruleBadMessageRule2V1FalsePositive [
 ]
 
 { #category : #'code-critics' }
+ManifestHL7 class >> ruleCollectionProtocolRuleV1FalsePositive [
+	^ #(#(#(#RGMethodDefinition #(#DoseMessage #from: #false)) #'2023-08-10T08:33:15.718+02:00') )
+]
+
+{ #category : #'code-critics' }
 ManifestHL7 class >> ruleExtraBlockRuleV1FalsePositive [
 	^ #(#(#(#RGMethodDefinition #(#H7PresenterMain #connectPresenters #false)) #'2022-08-18T15:32:51.223+02:00') )
+]
+
+{ #category : #'code-critics' }
+ManifestHL7 class >> ruleReCollectionAtCollectionSizeRuleV1FalsePositive [
+	^ #(#(#(#RGMethodDefinition #(#H7Field #last #false)) #'2023-08-10T08:26:49.638+02:00') )
 ]
