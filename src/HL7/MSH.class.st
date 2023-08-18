@@ -46,6 +46,12 @@ MSH >> parseFields: pieces [
 	^ tmp
 ]
 
+{ #category : #printing }
+MSH >> printOn: aStream [
+
+	aStream << 'MSH: ' <<self trigger
+]
+
 { #category : #testing }
 MSH >> profileOid [
 
@@ -58,4 +64,12 @@ MSH >> profileOid [
 MSH >> sendingApplication [
 
 	^ (self at: 3)  last at:1
+]
+
+{ #category : #testing }
+MSH >> trigger [
+
+	| fld |
+	fld := (self at: 9) third.
+	^ (fld at: 1), '^',(fld at: 2)
 ]

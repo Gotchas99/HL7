@@ -15,17 +15,17 @@ OBX class >> fields [
 	     18 'Equipment Instance Identifier' )
 ]
 
+{ #category : #'as yet unclassified' }
+OBX >> obsId [
+
+	^ ((self at: 3) at: 3) at: 2 ifAbsent:['']
+]
+
 { #category : #printing }
 OBX >> printOn: aStream [
 
-	aStream << 'OBX: ' << (((self at: 3) at: 3) at: 2) << ': '
-	<< ((self at: 5) at: 3) asString << ' '
-	<< ((self at: 6) at: 3) asString << ' ('
-	<< ((self at: 7) at: 3) asString << ')' "| tmp |
-	tmp := comps reduce: [ :a :b | a , ' * ' , b ].
-	aStream << tmp"
-
-	"	tmp size = 1
-		ifTrue: [ ^ tmp first ]
-		ifFalse: [ ^ tmp ]."
+	aStream << 'OBX: ' << self obsId << ': '
+	<< ((self at: 5  ifAbsent: #( nil nil '' )) at: 3 ifAbsent: '') asString << ' '
+	<< ((self at: 6  ifAbsent: #( nil nil '' )) at: 3 ifAbsent: '') asString << ' (' 
+	<< ((self at: 7 ifAbsent: #( nil nil '' )) at: 3) asString << ')'
 ]

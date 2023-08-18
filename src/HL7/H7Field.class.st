@@ -72,6 +72,10 @@ H7Field >> printOn: aStream [
 ]
 
 { #category : #accessing }
+H7Field >> txt [ ^txt
+]
+
+{ #category : #accessing }
 H7Field >> value [
 
 	^ comps  last
