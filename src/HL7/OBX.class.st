@@ -14,3 +14,18 @@ OBX class >> fields [
 	     16 'Responsible Observer' 17 'Observation Method'
 	     18 'Equipment Instance Identifier' )
 ]
+
+{ #category : #printing }
+OBX >> printOn: aStream [
+
+	aStream << 'OBX: ' << (((self at: 3) at: 3) at: 2) << ': '
+	<< ((self at: 5) at: 3) asString << ' '
+	<< ((self at: 6) at: 3) asString << ' ('
+	<< ((self at: 7) at: 3) asString << ')' "| tmp |
+	tmp := comps reduce: [ :a :b | a , ' * ' , b ].
+	aStream << tmp"
+
+	"	tmp size = 1
+		ifTrue: [ ^ tmp first ]
+		ifFalse: [ ^ tmp ]."
+]

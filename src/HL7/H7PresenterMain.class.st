@@ -173,9 +173,10 @@ H7Segment  initialize.
 { #category : #samples }
 H7PresenterMain >> sampleCategories [
 
-	^ #( #( #covid 'COVID' ) #( #dose 'ORM från qaelum' )#( #goran 'Samples from Göran' )
-	     #( #misc 'various samples' ) 
-	     #( #pcd 'PCD Samples' ) )
+	^ #( #( #covid 'COVID' ) #( #dose 'ORM från qaelum' )
+	     #( #goran 'Samples from Göran' )  #( #lab 'Laboratory incl Pathology' )
+	     #( #misc 'various samples' ) #( #pcd 'PCD Samples' )
+	    )
 ]
 
 { #category : #samples }
@@ -193,7 +194,9 @@ H7PresenterMain >> sampleMessages [
 	     #( #ormO01 'ORM 1' 'misc' ) #( #ormO01_2 'ORM O01 fr göran'
 	        'goran' ) #( #ormO01_3 'ORM från qaelum - 2D X-ray'
 	        'dose' ) #( #ormO01_4 'ORM från qaelum - mammography'
-	        'dose' ) #( #ormO01_5 'ORM från qaelum - CT' 'dose' ) #( #spot 'Connex Spot' 'pcd' ) )
+	        'dose' ) #( #ormO01_5 'ORM från qaelum - CT'
+	        'dose' ) #( #spot 'Connex Spot' 'pcd' )
+	#(#path01 'Pathology sample' #lab) )
 ]
 
 { #category : #accessing }
