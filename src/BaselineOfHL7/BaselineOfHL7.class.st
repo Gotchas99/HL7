@@ -11,8 +11,8 @@ BaselineOfHL7 >> baseline: spec [
 	spec for: #common do: [ 
 		spec
 			package: #'HL7-Core';
-			package: #'HL7-Tests' with: [ spec requires: #(  ) ];
-			package: #'HL7-Gui' with: [ spec requires: #(  ) ].
+			package: #'HL7-Tests' with: [ spec requires: #( #'HL7-Core' ) ];
+			package: #'HL7-Gui' with: [ spec requires: #( #'HL7-Core' ) ].
 		spec
 			group: 'Core' with: #( 'HL7-Core' );
 			group: 'CoreTests' with: #( 'HL7-Tests' );
