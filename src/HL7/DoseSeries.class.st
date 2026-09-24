@@ -1,22 +1,24 @@
 Class {
-	#name : #DoseSeries,
-	#superclass : #DoseParts,
-	#category : #'HL7-Dose'
+	#name : 'DoseSeries',
+	#superclass : 'DoseParts',
+	#category : 'HL7-Dose',
+	#package : 'HL7',
+	#tag : 'Dose'
 }
 
-{ #category : #printing }
+{ #category : 'printing' }
 DoseSeries >> acquisitionProtocol [
 
 	^ (flds detect: [ :f | f id = 'ACQUISITION_PROTOCOL' ])value
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 DoseSeries >> from: coll [
 
 	super from: coll
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 DoseSeries >> printOn: aStream [
 
 

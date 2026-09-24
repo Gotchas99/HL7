@@ -1,5 +1,5 @@
 Class {
-	#name : 'SPM',
+	#name : 'SCH',
 	#superclass : 'H7Segment',
 	#category : 'HL7-Core',
 	#package : 'HL7',
@@ -7,7 +7,7 @@ Class {
 }
 
 { #category : 'field definition' }
-SPM class >> fields [
+SCH class >> fields [
 
-	^ #( 1 'Set ID - SPM' )
+	^ #( 1 'Set ID - SCH' )
 ]

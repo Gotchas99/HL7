@@ -1,6 +1,6 @@
 Class {
-	#name : #DoseStudy,
-	#superclass : #DoseParts,
+	#name : 'DoseStudy',
+	#superclass : 'DoseParts',
 	#instVars : [
 		'accNo',
 		'descr',
@@ -9,10 +9,12 @@ Class {
 		'modality',
 		'station'
 	],
-	#category : #'HL7-Dose'
+	#category : 'HL7-Dose',
+	#package : 'HL7',
+	#tag : 'Dose'
 }
 
-{ #category : #adding }
+{ #category : 'adding' }
 DoseStudy >> addFromOBR: anObrMsg [
 
 	accNo := ((anObrMsg at: 3) at: 3) value.
@@ -23,12 +25,12 @@ DoseStudy >> addFromOBR: anObrMsg [
 	modality := ((anObrMsg at: 21) at: 3) value
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 DoseStudy >> from: coll [
 super from: coll
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 DoseStudy >> printOn: aStream [
 
 	aStream << 'Study: ' << descr << ' (' << accNo asString << ')' 

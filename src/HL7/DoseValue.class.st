@@ -1,6 +1,6 @@
 Class {
-	#name : #DoseValue,
-	#superclass : #Object,
+	#name : 'DoseValue',
+	#superclass : 'Object',
 	#instVars : [
 		'h7',
 		'valType',
@@ -17,10 +17,12 @@ Class {
 		'refRange',
 		'alertFlags'
 	],
-	#category : #'HL7-Dose'
+	#category : 'HL7-Dose',
+	#package : 'HL7',
+	#tag : 'Dose'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 DoseValue >> from: anObxMsg [
 
 	h7 := anObxMsg.
@@ -42,44 +44,44 @@ DoseValue >> from: anObxMsg [
 		           ifFalse: [ #Series ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 DoseValue >> id [ ^id 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 DoseValue >> obsTime [
 ^obsTime 
 
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 DoseValue >> printOn: aStream [
 
 	aStream << id << ': ' << value value asString << ' ' << unit value
 	<< ' ' << alertFlags " << '('<< ' subId: ' << subId asString << ')'"
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 DoseValue >> subId [ ^subId
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 DoseValue >> uid [
 
 	^ uid
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 DoseValue >> uidType [ ^uidType 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 DoseValue >> unit [
 
 	^ unit 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 DoseValue >> value [
 
 	^ value

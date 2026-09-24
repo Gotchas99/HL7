@@ -1,6 +1,6 @@
 Class {
-	#name : #H7Segment,
-	#superclass : #H7Entity,
+	#name : 'H7Segment',
+	#superclass : 'H7Entity',
 	#instVars : [
 		'txt',
 		'config',
@@ -9,59 +9,61 @@ Class {
 	#classInstVars : [
 		'fieldCat'
 	],
-	#category : #'HL7-Core'
+	#category : 'HL7-Core',
+	#package : 'HL7',
+	#tag : 'Core'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 H7Segment class >> fieldCat [
 ^fieldCat
 ]
 
-{ #category : #'field definition' }
+{ #category : 'field definition' }
 H7Segment class >> fields [
 
 	^#()
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 H7Segment class >> initialize [
 
 	self allSubclassesDo: [ :cl | cl initialize].
 		fieldCat := Dictionary newFromPairs: self fields 
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 H7Segment class >> on: aString config: aConf [
 
 	^ self new on: aString config: aConf
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 H7Segment class >> segmentFromLine: aSegLine [
 
 	| code |
 	code := ($| split: aSegLine) first trimmed .
-	^ self allSubclasses detect: [ :c | c name = code ]ifNone:[Error signal: ('Not found segment:',code)]
+	^ self allSubclasses detect: [ :c | c name = code asSymbol ]ifNone:[Error signal: ('Not found segment:',code)]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 H7Segment >> at:anIndex [
 ^fields at: anIndex 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 H7Segment >> at: anIndex ifAbsent: aBlock [
 
 	^ fields at: anIndex ifAbsent: aBlock
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 H7Segment >> fields [
 
 	^ fields 
 ]
 
-{ #category : #inspecting }
+{ #category : 'inspecting' }
 H7Segment >> inspectionString [
 
 	<inspectorPresentationOrder: -10 title: 'HL7 Segment'>
@@ -74,14 +76,14 @@ H7Segment >> inspectionString [
 		  yourself
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 H7Segment >> on: aString config: aConf [
 
 	txt := aString.
 	config := aConf .self parse
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 H7Segment >> parse [
 
 	| pieces flds |
@@ -90,7 +92,7 @@ H7Segment >> parse [
 	^ flds
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 H7Segment >> parseField: piece [
 
 	| tmp |
@@ -98,7 +100,7 @@ H7Segment >> parseField: piece [
 	^ tmp
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 H7Segment >> parseFields: pieces [
 
 	|  fld |
@@ -108,12 +110,12 @@ H7Segment >> parseFields: pieces [
 	^ fields
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 H7Segment >> segType [
 ^self class name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 H7Segment >> txt [
 ^txt
 ]

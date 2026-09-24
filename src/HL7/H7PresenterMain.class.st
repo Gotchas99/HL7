@@ -1,6 +1,6 @@
 Class {
-	#name : #H7PresenterMain,
-	#superclass : #SpPresenterWithModel,
+	#name : 'H7PresenterMain',
+	#superclass : 'SpPresenterWithModel',
 	#instVars : [
 		'categories',
 		'msgs',
@@ -9,10 +9,12 @@ Class {
 		'buttonReload',
 		'chkEmpties'
 	],
-	#category : #'HL7-Gui'
+	#category : 'HL7-Gui',
+	#package : 'HL7',
+	#tag : 'Gui'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 H7PresenterMain >> connectPresenters [
 
 	| sel txt tmp |
@@ -38,7 +40,7 @@ H7PresenterMain >> connectPresenters [
 	flds whenActivatedDo: [ :it | it selectedItem inspect ]
 ]
 
-{ #category : #layout }
+{ #category : 'layout' }
 H7PresenterMain >> defaultLayout [
 
 	^ SpPanedLayout newTopToBottom
@@ -52,28 +54,18 @@ H7PresenterMain >> defaultLayout [
 						    add: #msgs;
 						    add: #segs expand: true));
 		  add: #flds;
-		  positionOfSlider: 180; yourself
-	"SpBoxLayout newTopToBottom
-		  add: (SpBoxLayout newLeftToRight
-				   add: #buttonReload;
-				   add: #chkEmpties)
-		  height: 25;
-		  add: (SpBoxLayout newLeftToRight
-				   add: #categories;
-				   add: #msgs;
-				   add: #segs expand: true)
-		  height: 165;
-		  add: #flds expand: true;
-		  yourself"
+		  positionOfSlider: 180;
+		  
+			  yourself
 ]
 
-{ #category : #'accessing - resources' }
+{ #category : 'accessing - resources' }
 H7PresenterMain >> initialExtent [
 
 	^ 900 @ 900
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 H7PresenterMain >> initializePresenters [
 
 	categories := self newTable.
@@ -112,7 +104,7 @@ H7PresenterMain >> initializePresenters [
 		              state: false
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 H7PresenterMain >> initializeWindow: aWindowPresenter [
 
 	"override this to set window values before opening. 
@@ -128,7 +120,7 @@ H7PresenterMain >> initializeWindow: aWindowPresenter [
 		"windowIcon: self windowIcon"
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 H7PresenterMain >> msgMenu [
 
 	^ self newMenu
@@ -162,7 +154,7 @@ H7PresenterMain >> msgMenu [
 					  StPlayground openContents: txt ] ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 H7PresenterMain >> reload [
 
 H7Segment  initialize.
@@ -170,19 +162,32 @@ H7Segment  initialize.
 	self delete
 ]
 
-{ #category : #samples }
+{ #category : 'samples' }
 H7PresenterMain >> sampleCategories [
 
-	^ #( #( #covid 'COVID' ) #( #dose 'ORM från qaelum' )
-	     #( #goran 'Samples from Göran' )  #( #lab 'Laboratory incl Pathology' )
-	     #( #misc 'various samples' ) #( #pcd 'PCD Samples' )
-	    )
+	^ #( 
+	#(#ews 'EWS från Philips')
+	#( #pas 'PAS' ) #( #covid 'COVID' ) #( #dose 'ORM från qaelum' )
+	     #( #goran 'Samples from Göran' )
+	     #( #lab 'Laboratory incl Pathology' )
+	     #( #misc 'various samples' ) #( #pcd 'PCD Samples' ) )
 ]
 
-{ #category : #samples }
+{ #category : 'samples' }
 H7PresenterMain >> sampleMessages [
 
-	^ #( #( #covid01 'COVID lab request' 'covid' )
+	^ #(
+	#(#ews1 'philips ews1' #ews)
+	#(#ews2 'philips ews2' #ews)
+	#(#ews3  'philips ews3' #ews)
+	#(#ews4 'philips ews4' #ews)
+	#(#ews5  'philips MEWS' #ews)
+	#(#ews6 'philips EWS SPS' #ews)
+	 #( #pas1 'planerat besök från Elvis' 'pas' )
+	     #( #pas2 'planerat besök från Elvis' 'pas' )
+	     #( #pas3 'planerat besök från Asynja'
+	        'pas' ) #( #pas4 'Rapport från Axel till Asynja'
+	        'pas' ) #( #covid01 'COVID lab request' 'covid' )
 	     #( #pcd01_episode 'PCD Episodic' 'pcd' )
 	     #( #pcd01_physMon 'PCD 01 Physical monitor'
 	        'pcd' ) #( #pcd15 'PCD 15 sample' 'pcd' )
@@ -196,9 +201,9 @@ H7PresenterMain >> sampleMessages [
 	        'dose' ) #( #ormO01_4 'ORM från qaelum - mammography'
 	        'dose' ) #( #ormO01_5 'ORM från qaelum - CT'
 	        'dose' ) #( #spot 'Connex Spot' 'pcd' )
-	#(#path01 'Pathology sample' #lab) )
+	     #( #path01 'Pathology sample' #lab ) )
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 H7PresenterMain >> title [ ^'H7 - app'
 ]

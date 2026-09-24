@@ -1,6 +1,6 @@
 Class {
-	#name : #PcdValue,
-	#superclass : #Object,
+	#name : 'PcdValue',
+	#superclass : 'Object',
 	#instVars : [
 		'h7',
 		'idNo',
@@ -11,22 +11,24 @@ Class {
 		'unit',
 		'eq'
 	],
-	#category : #'HL7-PCD'
+	#category : 'HL7-PCD',
+	#package : 'HL7',
+	#tag : 'PCD'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 PcdValue class >> from: anObxMsg [
 
 	^ self new from: anObxMsg
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PcdValue >> eq [
 
 	^ eq
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 PcdValue >> from: anObxMsg [
 
 	| idFld  |
@@ -41,19 +43,19 @@ PcdValue >> from: anObxMsg [
 	eq := (anObxMsg at: 18 ifAbsent: [ #( 0 0 nil ) ]) at: 3
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PcdValue >> id [
 
 	^ id
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PcdValue >> idNo [
 
 	^ idNo
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PcdValue >> nodeType [
 
 	| ids |
@@ -63,32 +65,32 @@ PcdValue >> nodeType [
 	ids fourth = '0' ifTrue: [ ^ #Chan ].^#Metric
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 PcdValue >> printOn: aStream [
 
 	aStream << id
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PcdValue >> subId [
 
 	^ subId
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PcdValue >> unit [
 
 	^ unit
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PcdValue >> valType [
 
 	^ valType
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PcdValue >> value [
 
 	^ value

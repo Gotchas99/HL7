@@ -1,5 +1,7 @@
 Class {
-	#name : #NmMDIB,
-	#superclass : #Iso11073,
-	#category : #'HL7-PCD'
+	#name : 'NmMDIB',
+	#superclass : 'Iso11073',
+	#category : 'HL7-PCD',
+	#package : 'HL7',
+	#tag : 'PCD'
 }

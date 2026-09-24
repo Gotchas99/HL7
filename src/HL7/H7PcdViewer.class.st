@@ -1,16 +1,18 @@
 Class {
-	#name : #H7PcdViewer,
-	#superclass : #SpPresenterWithModel,
+	#name : 'H7PcdViewer',
+	#superclass : 'SpPresenterWithModel',
 	#instVars : [
 		'h7',
 		'pcd',
 		'iso',
 		'tree1'
 	],
-	#category : #'HL7-Gui'
+	#category : 'HL7-Gui',
+	#package : 'HL7',
+	#tag : 'Gui'
 }
 
-{ #category : #layout }
+{ #category : 'layout' }
 H7PcdViewer class >> defaultLayout [
 
 	^ SpBoxLayout newTopToBottom
@@ -18,19 +20,19 @@ H7PcdViewer class >> defaultLayout [
 		  yourself
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 H7PcdViewer class >> openOn: aH7Msg [
 
 	self new msg:aH7Msg ;open
 ]
 
-{ #category : #'morphic ui' }
+{ #category : 'morphic ui' }
 H7PcdViewer >> initialExtent [
 
-	^ 800 @ 800
+	^ 900 @ 800
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 H7PcdViewer >> initializePresenters [
 
 	tree1 := self newTreeTable.
@@ -58,14 +60,14 @@ H7PcdViewer >> initializePresenters [
 		whenActivatedDo: [ :selection | self toggleNode: selection ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 H7PcdViewer >> msg: aH7Msg [
 h7:=aH7Msg.
 	pcd := PcdMessage from: h7.
 	iso := pcd mds.tree1 roots:{iso}
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 H7PcdViewer >> toggleNode: selection [
 
 	| ad path item |

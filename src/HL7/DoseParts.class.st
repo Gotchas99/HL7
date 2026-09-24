@@ -1,14 +1,16 @@
 Class {
-	#name : #DoseParts,
-	#superclass : #Object,
+	#name : 'DoseParts',
+	#superclass : 'Object',
 	#instVars : [
 		'flds',
 		'bodyPart'
 	],
-	#category : #'HL7-Dose'
+	#category : 'HL7-Dose',
+	#package : 'HL7',
+	#tag : 'Dose'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 DoseParts >> from: coll [
 
 	| obsTime  |

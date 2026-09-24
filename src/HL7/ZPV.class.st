@@ -1,5 +1,5 @@
 Class {
-	#name : 'NK1',
+	#name : 'ZPV',
 	#superclass : 'H7Segment',
 	#category : 'HL7-Core',
 	#package : 'HL7',

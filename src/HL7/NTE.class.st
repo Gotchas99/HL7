@@ -1,5 +1,5 @@
 Class {
-	#name : 'SPM',
+	#name : 'NTE',
 	#superclass : 'H7Segment',
 	#category : 'HL7-Core',
 	#package : 'HL7',
@@ -7,7 +7,13 @@ Class {
 }
 
 { #category : 'field definition' }
-SPM class >> fields [
+NTE class >> fields [
 
-	^ #( 1 'Set ID - SPM' )
+	^ #(  )
+]
+
+{ #category : 'printing' }
+NTE >> printOn: aStream [
+
+	aStream << 'NTE (Note)'
 ]

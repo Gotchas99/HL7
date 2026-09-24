@@ -1,5 +1,5 @@
 Class {
-	#name : 'NK1',
+	#name : 'RGS',
 	#superclass : 'H7Segment',
 	#category : 'HL7-Core',
 	#package : 'HL7',

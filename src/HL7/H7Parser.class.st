@@ -1,18 +1,20 @@
 Class {
-	#name : #H7Parser,
-	#superclass : #Object,
+	#name : 'H7Parser',
+	#superclass : 'Object',
 	#instVars : [
 		'txt'
 	],
-	#category : #'HL7-Core'
+	#category : 'HL7-Core',
+	#package : 'HL7',
+	#tag : 'Core'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 H7Parser class >> on: aString [
 ^self new on: aString
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 H7Parser >> extractConfig [
 
 	| seps |
@@ -27,13 +29,13 @@ H7Parser >> extractConfig [
 	^ seps
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 H7Parser >> on: aString [
 
 	txt := aString trimmed
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 H7Parser >> parse [
 
 	| segs conf |

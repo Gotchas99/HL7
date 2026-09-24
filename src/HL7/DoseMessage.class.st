@@ -1,6 +1,6 @@
 Class {
-	#name : #DoseMessage,
-	#superclass : #Object,
+	#name : 'DoseMessage',
+	#superclass : 'Object',
 	#instVars : [
 		'h7',
 		'subIds',
@@ -8,16 +8,18 @@ Class {
 		'series',
 		'alerts'
 	],
-	#category : #'HL7-Dose'
+	#category : 'HL7-Dose',
+	#package : 'HL7',
+	#tag : 'Dose'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 DoseMessage >> alertsFrom: dict [
 
 	^ (dict at: '' ifAbsent:[#()]) collect: [ :a | DoseAlert new from: a ]
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 DoseMessage >> from: aH7Msg [
 
 	| obxs vals |
@@ -39,7 +41,7 @@ DoseMessage >> from: aH7Msg [
 	self inspect
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 DoseMessage >> seriesFrom: dict [
 
 	| seriesDict |
@@ -49,7 +51,7 @@ DoseMessage >> seriesFrom: dict [
 	^ (seriesDict collect: [ :s | DoseSeries new from: s ])values
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 DoseMessage >> studyFrom: dict [
 
 	^ DoseStudy new from: (subIds at: '0') 

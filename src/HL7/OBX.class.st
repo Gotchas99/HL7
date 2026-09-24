@@ -1,10 +1,12 @@
 Class {
-	#name : #OBX,
-	#superclass : #H7Segment,
-	#category : #'HL7-Core'
+	#name : 'OBX',
+	#superclass : 'H7Segment',
+	#category : 'HL7-Core',
+	#package : 'HL7',
+	#tag : 'Core'
 }
 
-{ #category : #'field definition' }
+{ #category : 'field definition' }
 OBX class >> fields [
 
 	^ #( 1 'Set ID – OBX' 2 'Value Type (TX=Text, CE=Code)'
@@ -15,13 +17,13 @@ OBX class >> fields [
 	     18 'Equipment Instance Identifier' )
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 OBX >> obsId [
 
 	^ ((self at: 3) at: 3) at: 2 ifAbsent:['']
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 OBX >> printOn: aStream [
 
 	aStream << 'OBX: ' << self obsId << ': '

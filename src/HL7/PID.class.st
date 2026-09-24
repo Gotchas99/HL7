@@ -1,10 +1,12 @@
 Class {
-	#name : #PID,
-	#superclass : #H7Segment,
-	#category : #'HL7-Core'
+	#name : 'PID',
+	#superclass : 'H7Segment',
+	#category : 'HL7-Core',
+	#package : 'HL7',
+	#tag : 'Core'
 }
 
-{ #category : #'field definition' }
+{ #category : 'field definition' }
 PID class >> fields [
 
 	^ #( 1 'Set ID' 2 'Patient ID' 3 'Patient Identifier List'

@@ -1,20 +1,22 @@
 Class {
-	#name : #H7Field,
-	#superclass : #Object,
+	#name : 'H7Field',
+	#superclass : 'Object',
 	#instVars : [
 		'txt',
 		'comps'
 	],
-	#category : #'HL7-Core'
+	#category : 'HL7-Core',
+	#package : 'HL7',
+	#tag : 'Core'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 H7Field class >> on: aString [
 
 	^ self new on: aString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 H7Field >> at: anIndex [
 
 	^ comps at: anIndex
@@ -22,24 +24,24 @@ H7Field >> at: anIndex [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 H7Field >> at: anIndex  ifAbsent: aBlock [
 
 	^ comps at: anIndex  ifAbsent: aBlock
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 H7Field >> first [
 ^self at:1
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 H7Field >> isEmpty [
 
 	^ comps isEmpty or: [ comps first isEmpty ]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 H7Field >> isPCD [
 
 	| issuer |
@@ -47,20 +49,20 @@ H7Field >> isPCD [
 	^ issuer = 'IHE PCD' or: [ ^ issuer = 'IHE_PCD' ] 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 H7Field >> last [
 
 	^ self at: self size
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 H7Field >> on: aString [
 
 	txt := aString trimmed.
 	comps := txt trimmed splitOn: $^
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 H7Field >> printOn: aStream [
 
 	| tmp |
@@ -71,11 +73,11 @@ H7Field >> printOn: aStream [
 		ifFalse: [ ^ tmp ]."
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 H7Field >> txt [ ^txt
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 H7Field >> value [
 
 	^ comps  last

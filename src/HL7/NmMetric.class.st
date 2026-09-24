@@ -1,15 +1,17 @@
 Class {
-	#name : #NmMetric,
-	#superclass : #Iso11073,
+	#name : 'NmMetric',
+	#superclass : 'Iso11073',
 	#instVars : [
 		'value',
 		'unit',
 		'unitNo'
 	],
-	#category : #'HL7-PCD'
+	#category : 'HL7-PCD',
+	#package : 'HL7',
+	#tag : 'PCD'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 NmMetric >> from: aPcd [
 
 	super from: aPcd.
@@ -18,22 +20,22 @@ NmMetric >> from: aPcd [
 	aPcd unit isEmpty ifFalse: [ unit := aPcd unit at: 2 ]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 NmMetric >> isMetric [ ^true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 NmMetric >> level [
 ^4
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 NmMetric >> unit [
 
 	^ unit
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 NmMetric >> value [
 
 	^ value

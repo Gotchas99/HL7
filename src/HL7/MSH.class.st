@@ -1,10 +1,12 @@
 Class {
-	#name : #MSH,
-	#superclass : #H7Segment,
-	#category : #'HL7-Core'
+	#name : 'MSH',
+	#superclass : 'H7Segment',
+	#category : 'HL7-Core',
+	#package : 'HL7',
+	#tag : 'Core'
 }
 
-{ #category : #'field definition' }
+{ #category : 'field definition' }
 MSH class >> fields [
 
 	^ #( 1 'Field separator' 2 'Encoding characters'
@@ -16,7 +18,7 @@ MSH class >> fields [
 	     18 'Character Set' 21 'Message Profile Identifier')
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MSH >> isPCD [
 
 	| fld |
@@ -24,13 +26,13 @@ MSH >> isPCD [
 	^fld isPCD
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MSH >> msgType [
 
 	^ (self at: 9) last at: 3
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 MSH >> parseFields: pieces [
 
 	| tmp fsep fld |
@@ -46,13 +48,13 @@ MSH >> parseFields: pieces [
 	^ tmp
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 MSH >> printOn: aStream [
 
-	aStream << 'MSH: ' <<self trigger
+	aStream << 'MSH (Message header): ' << self trigger
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MSH >> profileOid [
 
 	| fld |
@@ -60,13 +62,13 @@ MSH >> profileOid [
 	^ fld at:3
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MSH >> sendingApplication [
 
 	^ (self at: 3)  last at:1
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MSH >> trigger [
 
 	| fld |

@@ -1,6 +1,6 @@
 Class {
-	#name : #Iso11073,
-	#superclass : #Object,
+	#name : 'Iso11073',
+	#superclass : 'Object',
 	#instVars : [
 		'idNo',
 		'id',
@@ -8,10 +8,12 @@ Class {
 		'valType',
 		'nodes'
 	],
-	#category : #'HL7-PCD'
+	#category : 'HL7-PCD',
+	#package : 'HL7',
+	#tag : 'PCD'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 Iso11073 class >> from: aPcd [
 
 	| className item |
@@ -20,7 +22,7 @@ Iso11073 class >> from: aPcd [
 	^(item from:aPcd)
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 Iso11073 >> add: aNode [
 
 	| p |
@@ -31,7 +33,7 @@ Iso11073 >> add: aNode [
 			p add: aNode ]
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 Iso11073 >> from: aPcd [
 
 	idNo := aPcd idNo asInteger.
@@ -40,7 +42,19 @@ Iso11073 >> from: aPcd [
 	valType := aPcd valType at: 1
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
+Iso11073 >> getIdNo: anIdNo [
+
+	| res |
+	idNo = anIdNo ifTrue: [ ^ self ].
+	nodes ifEmpty: [ ^ nil ].
+	res := nodes
+		       collect: [ :n | n getIdNo: anIdNo ]
+		       thenReject: [ :n | n isNil ].
+	^ res ifEmpty: [ nil ] ifNotEmpty: [ res first ]
+]
+
+{ #category : 'accessing' }
 Iso11073 >> getNode: aSubId [
 
 	| res |
@@ -52,38 +66,38 @@ Iso11073 >> getNode: aSubId [
 	^ res ifEmpty:   [nil ] ifNotEmpty: [  res first ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Iso11073 >> idNo [
 
 	^ idNo 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Iso11073 >> initialize [ 
 nodes:= OrderedCollection new.
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 Iso11073 >> isMetric [
 ^false
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Iso11073 >> level [
 self subclassResponsibility 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Iso11073 >> name [
 ^id allButFirst:4
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Iso11073 >> nodes [
 ^nodes
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Iso11073 >> parentId [
 
 	| ids tmp |
@@ -93,7 +107,7 @@ Iso11073 >> parentId [
 	^ tmp
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 Iso11073 >> printOn: aStream [
 
 	"self className allButFirst: 2"
@@ -101,16 +115,16 @@ Iso11073 >> printOn: aStream [
 	aStream << (self name) << '(' << subId << ')'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Iso11073 >> subId [ ^subId 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Iso11073 >> unit [
 
 	^ ''
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Iso11073 >> value [ ^''
 ]
