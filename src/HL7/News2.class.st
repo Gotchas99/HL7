@@ -80,7 +80,7 @@ News2 >> calcTotalScore: scores [
 	^scores
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'score engine' }
 News2 >> compositionNews2: scores [
 
 	| template result |
@@ -89,7 +89,7 @@ News2 >> compositionNews2: scores [
 	^ result
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'score engine' }
 News2 >> compositionTemplateNews2 [
 
 	^ '"news2-christer/national_early_warning_score_2_news2/respiration_rate|ordinal": {respiration},
@@ -118,7 +118,7 @@ News2 >> compositionTemplateNews2 [
 '
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'incoming' }
 News2 >> compositionTemplateValues [
 
 	^ '
@@ -150,30 +150,32 @@ News2 >> compositionTemplateValues [
 '
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'score engine' }
 News2 >> compositionUpdate [
 	^ ''
 ]
 
-{ #category : 'as yet unclassified' }
-News2 >> createValueCompFrom: aHl7 [
+{ #category : 'incoming' }
+News2 >> createValueCompFrom: dict [
 
-	|   dict   template result |
-		dict := self extractFromHl7: aHl7 .
+	|  template result |
+	
 	template := self compositionTemplateValues.
 	result := template format: dict.
 	^ result
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'private' }
 News2 >> ehrClient [
-| cl |
-cl:= ZnClient new url: 'https://sandbox.ehrbase.org/ehrbase/rest/openehr/v1/'.
-^cl
-	
+
+	| cl |
+	cl := ZnClient new url:
+		      'https://sandbox.ehrbase.org/ehrbase/rest/openehr/v1/'.
+		cl accept:'application/json'.
+	^ cl
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'incoming' }
 News2 >> extractFromHl7: aHl7 [
 
 	| h7 pcd dict patient_id timestamp obr7 |
@@ -181,7 +183,7 @@ News2 >> extractFromHl7: aHl7 [
 	pcd := PcdMessage from: h7.
 	obr7 := ((h7 segment: #OBR) at: 7) last value.
 	timestamp := DateAndTime readYMDHMSfromDigits: obr7 readStream.
-	dict := Dictionary new.
+	dict := Dictionary new.     
 	dict at: #timestamp put: timestamp asString.
 	dict at: #respiration put: (pcd getIdNo: 151570) value.
 	dict at: #spo put: (pcd getIdNo: 150456) value.
@@ -195,7 +197,7 @@ News2 >> extractFromHl7: aHl7 [
 	^ dict
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'score engine' }
 News2 >> extractValsFromComp: aDict [
 
 	| dict |
@@ -213,13 +215,29 @@ News2 >> extractValsFromComp: aDict [
 	^ dict
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'private' }
 News2 >> getEhrId: patient_id [
 
 	^'0d3d3cdf-3a64-40f4-8f3b-5fcd51ec6c7d'
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'incoming' }
+News2 >> processHl7: aHl7Msg [
+
+	| inner comp cl dict |
+	dict := self extractFromHl7: aHl7Msg.
+	inner := self createValueCompFrom: dict.
+	comp := ZnEntity json: '{' , inner , '}'.
+	cl := self ehrClient.
+	"ehr/{{tolvan}}/composition?format=FLAT&templateId=news2-christer"
+	cl addPath: { 'ehr'. dict at:#ehrid. 'composition' };
+	queryAt:'format' put: 'FLAT';queryAt: 'templateId' put:'news2-christer' .
+	cl entity: comp.
+	cl post.
+	^ cl
+]
+
+{ #category : 'score engine' }
 News2 >> scoreComposition: aDict [
 
 	| vals scores |
