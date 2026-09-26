@@ -183,13 +183,13 @@ News2 >> extractFromHl7: aHl7 [
 	pcd := PcdMessage from: h7.
 	obr7 := ((h7 segment: #OBR) at: 7) last value.
 	timestamp := DateAndTime readYMDHMSfromDigits: obr7 readStream.
-	dict := Dictionary new.     
+	dict := Dictionary new.
 	dict at: #timestamp put: timestamp asString.
-	dict at: #respiration put: (pcd getIdNo: 151570) value.
+	dict at: #respiration put: (pcd getIdNo: 151562) value.
 	dict at: #spo put: (pcd getIdNo: 150456) value.
-	dict at: #systolic put: (pcd getIdNo: 150021) value.
-	dict at: #pulse put: (pcd getIdNo: 149538) value.
-	dict at: #temperature put: (pcd getIdNo: 150344) value.
+	dict at: #systolic put: (pcd getIdNo: 150037) value.
+	dict at: #pulse put: (pcd getIdNo: 149514) value.
+	dict at: #temperature put: (pcd getIdNo: 188420) value.
 	patient_id := ((pcd hl7 segment: #pid) at: 2) third.
 	"namn: ((pcd hl7 segment: #pid) at:5) third."
 	dict at: #ehrid put: (self getEhrId: patient_id).

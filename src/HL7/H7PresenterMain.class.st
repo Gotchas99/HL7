@@ -176,14 +176,11 @@ H7PresenterMain >> sampleCategories [
 { #category : 'samples' }
 H7PresenterMain >> sampleMessages [
 
-	^ #(
-	#(#ews1 'philips ews1' #ews)
-	#(#ews2 'philips ews2' #ews)
-	#(#ews3  'philips ews3' #ews)
-	#(#ews4 'philips ews4' #ews)
-	#(#ews5  'philips MEWS' #ews)
-	#(#ews6 'philips EWS SPS' #ews)
-	 #( #pas1 'planerat besök från Elvis' 'pas' )
+	^ #( #( #ews_mx750_NAL 'philips MX750 på NÄL' #ews ) #( #ews_ix_manual 'philips från iX manual' #ews ) #( #ews1 'philips ews1' #ews ) #( #ews2 'philips ews2'
+	        #ews ) #( #ews3 'philips ews3' #ews )
+	     #( #ews4 'philips ews4' #ews ) #( #ews5 'philips MEWS'
+	        #ews ) #( #ews6 'philips EWS SPS' #ews )
+	     #( #pas1 'planerat besök från Elvis' 'pas' )
 	     #( #pas2 'planerat besök från Elvis' 'pas' )
 	     #( #pas3 'planerat besök från Asynja'
 	        'pas' ) #( #pas4 'Rapport från Axel till Asynja'
