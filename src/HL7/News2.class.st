@@ -92,7 +92,8 @@ News2 >> compositionNews2: scores [
 { #category : 'score engine' }
 News2 >> compositionTemplateNews2 [
 
-	^ '"news2-christer/national_early_warning_score_2_news2/respiration_rate|ordinal": {respiration},
+	^ '
+"news2-christer/national_early_warning_score_2_news2/respiration_rate|ordinal": {respiration},
 "news2-christer/national_early_warning_score_2_news2/respiration_rate|code": "at0021",
 "news2-christer/national_early_warning_score_2_news2/spo_scale_1|ordinal": {spo},
 "news2-christer/national_early_warning_score_2_news2/spo_scale_1|code": "at0033",
@@ -114,7 +115,7 @@ News2 >> compositionTemplateNews2 [
 "news2-christer/national_early_warning_score_2_news2/clinical_risk_category|value": "Low",
 "news2-christer/national_early_warning_score_2_news2/clinical_risk_category|code": "at0057",
 "news2-christer/national_early_warning_score_2_news2/clinical_risk_category|terminology": "local",
-"news2-christer/national_early_warning_score_2_news2/time": "2022-02-03T04:05:06.0",
+"news2-christer/national_early_warning_score_2_news2/time": "2022-02-03T04:05:06.0"
 '
 ]
 
@@ -126,10 +127,15 @@ News2 >> compositionTemplateValues [
   "news2-christer/context/setting|code": "232",
   "news2-christer/context/setting|value": "secondary medical care",
   "news2-christer/context/setting|terminology": "openehr",
+
   "news2-christer/category|code": "433",
   "news2-christer/category|value": "event",
   "news2-christer/category|terminology": "openehr",
-  "news2-christer/composer|name": "Alve Don",
+  "news2-christer/composer|name": "Dr. Alve Don",
+
+  "news2-christer/context/_other_context:0/processing_status:0/status|code": "at0002",
+  "news2-christer/context/_other_context:0/processing_status:0/status|value": "Pending",
+
   "news2-christer/respiration/any_event:0/rate|magnitude": {respiration},
   "news2-christer/respiration/any_event:0/rate|unit": "/min",
   "news2-christer/pulse_oximetry/any_event:0/spo|numerator": {spo},
@@ -144,8 +150,8 @@ News2 >> compositionTemplateValues [
   "news2-christer/body_temperature/any_event:0/temperature|magnitude": {temperature},
   "news2-christer/body_temperature/any_event:0/temperature|unit": "Cel",
   "news2-christer/language|terminology": "ISO_639-1",
-  "news2-christer/language|code": "en",
-  "news2-christer/territory|code": "DE",
+  "news2-christer/language|code": "sv",
+  "news2-christer/territory|code": "SE",
   "news2-christer/territory|terminology": "ISO_3166-1"
 '
 ]
@@ -158,11 +164,10 @@ News2 >> compositionUpdate [
 { #category : 'incoming' }
 News2 >> createValueCompFrom: dict [
 
-	|  template result |
-	
+	| template result |
 	template := self compositionTemplateValues.
 	result := template format: dict.
-	^ result
+	^ '{',result,'}'
 ]
 
 { #category : 'private' }
@@ -227,11 +232,16 @@ News2 >> processHl7: aHl7Msg [
 	| inner comp cl dict |
 	dict := self extractFromHl7: aHl7Msg.
 	inner := self createValueCompFrom: dict.
-	comp := ZnEntity json: '{' , inner , '}'.
+	comp := ZnEntity json:  inner .
 	cl := self ehrClient.
 	"ehr/{{tolvan}}/composition?format=FLAT&templateId=news2-christer"
-	cl addPath: { 'ehr'. dict at:#ehrid. 'composition' };
-	queryAt:'format' put: 'FLAT';queryAt: 'templateId' put:'news2-christer' .
+	cl
+		addPath: {
+				'ehr'.
+				(dict at: #ehrid).
+				'composition' };
+		queryAt: 'format' put: 'FLAT';
+		queryAt: 'templateId' put: 'news2-christer'.
 	cl entity: comp.
 	cl post.
 	^ cl
