@@ -68,6 +68,24 @@ News2 class >> sample_composition [
 }'.
 ]
 
+{ #category : 'score engine' }
+News2 >> aqlPending [
+
+	| query query2 aql |
+	query := 'SELECT
+    c/uid/value AS composition_id,
+    c/context/start_time/value AS context_time
+FROM
+    EHR e
+    CONTAINS COMPOSITION c
+WHERE
+    c/archetype_details/template_id/value = ''news2-christer''
+    AND NOT c/context/other_context[at0001]/items[openEHR-EHR-CLUSTER.processing_status.v0]/items[at0001]/value/defining_code/code_string = ''at0003'' '.
+	query2 := query copyReplaceAll: String cr with: '\r'.
+	aql := '{ "q": "' , query2 , '"}'.
+	^ aql
+]
+
 { #category : 'score' }
 News2 >> calcTotalScore: scores [
 
@@ -78,6 +96,12 @@ News2 >> calcTotalScore: scores [
 		         into: [ :sum :fld | sum + (scores at: fld) ].
 	scores at: #total put: total.
 	^scores
+]
+
+{ #category : 'score engine' }
+News2 >> cleanupOldComp: compValues [
+
+	self halt.
 ]
 
 { #category : 'score engine' }
@@ -133,9 +157,10 @@ News2 >> compositionTemplateValues [
   "news2-christer/category|terminology": "openehr",
   "news2-christer/composer|name": "Dr. Alve Don",
 
-  "news2-christer/context/_other_context:0/processing_status:0/status|code": "at0002",
-  "news2-christer/context/_other_context:0/processing_status:0/status|value": "Pending",
-
+  "news2-christer/context/processing_status/status|value" : "pending",
+  "news2-christer/context/processing_status/status|code" : "at0002",
+  "news2-christer/context/processing_status/status|terminology" : "local",
+  
   "news2-christer/respiration/any_event:0/rate|magnitude": {respiration},
   "news2-christer/respiration/any_event:0/rate|unit": "/min",
   "news2-christer/pulse_oximetry/any_event:0/spo|numerator": {spo},
@@ -158,7 +183,8 @@ News2 >> compositionTemplateValues [
 
 { #category : 'score engine' }
 News2 >> compositionUpdate [
-	^ ''
+
+	self flag: #todo
 ]
 
 { #category : 'incoming' }
@@ -220,6 +246,23 @@ News2 >> extractValsFromComp: aDict [
 	^ dict
 ]
 
+{ #category : 'score engine' }
+News2 >> findPending [
+
+	| aql body cl rows ids |
+	aql := self aqlPending.
+	body := ZnEntity json: aql.
+	cl := self ehrClient.
+	"ehr/{{tolvan}}/composition?format=FLAT&templateId=news2-christer"
+	cl addPath: { 'query'. 'aql' }.
+	cl entity: body.
+	cl post.
+	self assert: cl isSuccess.
+	rows:=((STONJSON fromString: cl contents)	at:#rows).
+	ids:= rows collect: #first.
+	^ ids
+]
+
 { #category : 'private' }
 News2 >> getEhrId: patient_id [
 
@@ -244,17 +287,41 @@ News2 >> processHl7: aHl7Msg [
 		queryAt: 'templateId' put: 'news2-christer'.
 	cl entity: comp.
 	cl post.
+	self assert: cl isSuccess .
 	^ cl
 ]
 
 { #category : 'score engine' }
-News2 >> scoreComposition: aDict [
+News2 >> retrieveComp: id [
 
-	| vals scores |
-	vals := self extractValsFromComp: aDict. 
+	| aql cl |
+	self flag: #todo.
+	aql:=''.
+	cl:=self ehrClient .
+]
+
+{ #category : 'score engine' }
+News2 >> scoreAllPending [
+
+	| allPendingIDs |
+	allPendingIDs := self findPending.
+	allPendingIDs do: [ :id | self scoreOneComp: id ] 
+]
+
+{ #category : 'score engine' }
+News2 >> scoreOneComp: anId [
+
+	| compValues vals scores compNews compOld comp |
+	self halt.
+	compValues := self retrieveComp: anId.
+	vals := self extractValsFromComp: compValues.
 	scores := self scoreValues: vals.
-self calcTotalScore: scores.
-	^ scores
+	self calcTotalScore: scores.
+compNews:=self	compositionNews2: scores.
+	compOld:= self cleanupOldComp: compValues .
+	comp:= '{',compOld,',',compNews,'}'.
+	^comp
+	
 ]
 
 { #category : 'score' }
