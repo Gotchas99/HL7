@@ -296,8 +296,16 @@ News2 >> retrieveComp: id [
 
 	| aql cl |
 	self flag: #todo.
-	aql:=''.
-	cl:=self ehrClient .
+	aql := ''.
+	cl := self ehrClient.
+	"{{url}}/rest/ecis/v1/composition/085f4c40-9c25-4857-b3a3-270ad7ac9026::local.ehrbase.org::1?format=FLAT"
+	cl url: '/rest/ecis/v1/composition'.
+	cl addPath: id;
+	queryAt: 'format' put: 'FLAT'.
+	"cl addPath: {			'composition'.			id }."
+	cl get.
+	self assert: cl isSuccess.
+	cl contents
 ]
 
 { #category : 'score engine' }
