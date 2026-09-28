@@ -184,12 +184,6 @@ News2 >> compositionTemplateValues [
 '
 ]
 
-{ #category : 'score engine' }
-News2 >> compositionUpdate [
-
-	self flag: #todo
-]
-
 { #category : 'incoming' }
 News2 >> createValueCompFrom: dict [
 
@@ -285,24 +279,55 @@ News2 >> getEhrId: patient_id [
 ]
 
 { #category : 'incoming' }
-News2 >> processHl7: aHl7Msg [
+News2 >> postValueComposition: inner ehrId: anEhrId [
 
-	| inner comp cl dict |
-	dict := self extractFromHl7: aHl7Msg.
-	inner := self createValueCompFrom: dict.
-	comp := ZnEntity json:  inner .
+	| comp cl |
+	comp := ZnEntity json: inner.
 	cl := self ehrClient.
 	"ehr/{{tolvan}}/composition?format=FLAT&templateId=news2-christer"
 	cl
-		addPath: {
+		addPath: { 
 				'ehr'.
-				(dict at: #ehrid).
+				anEhrId.
 				'composition' };
 		queryAt: 'format' put: 'FLAT';
 		queryAt: 'templateId' put: 'news2-christer'.
 	cl entity: comp.
 	cl post.
-	self assert: cl isSuccess .
+	self assert: cl isSuccess.
+	^ cl
+]
+
+{ #category : 'incoming' }
+News2 >> processHl7: aHl7Msg [
+
+	| inner  dict |
+	dict := self extractFromHl7: aHl7Msg.
+	inner := self createValueCompFrom: dict.
+	self postValueComposition: inner ehrId: (dict at: #ehrid)
+]
+
+{ #category : 'score engine' }
+News2 >> putNews2Composition: comp ehrId: anEhrId [
+
+	| cl versionedUid uid |
+	versionedUid:=(comp at:'news2-christer/_uid').
+	uid:= versionedUid copyUpTo: $:.
+	cl := self ehrClient forJsonREST ;contentReader:nil.
+	"ehr/{{tolvan}}/composition?format=FLAT&templateId=news2-christer"
+	cl
+		addPath: {
+				'ehr'.
+				anEhrId.
+				'composition'.
+				uid }.
+cl		queryAt: 'format' put: 'FLAT';
+		queryAt: 'templateId' put: 'news2-christer'.
+		cl headerAt: 'If-Match' put:versionedUid. 
+		
+	cl contents: comp.
+	cl put.
+	self assert: cl isSuccess.
 	^ cl
 ]
 
@@ -311,10 +336,9 @@ News2 >> retrieveComp: twoIds [
 	"{{url}}/rest/openehr/v1/ehr/{{tolvan}}/composition/bf1f29c3-b652-460a-bb53-c0470202c5b8::local.ehrbase.org::1?format=FLAT"
 
 	| cl ehrId compId |
-	self flag: #todo.
 	ehrId := twoIds first.
 	compId := twoIds second.
-	cl := self ehrClient forJsonREST .
+	cl := self ehrClient forJsonREST.
 	cl
 		addPath: 'ehr';
 		addPath: ehrId;
@@ -323,7 +347,7 @@ News2 >> retrieveComp: twoIds [
 		queryAt: 'format' put: 'FLAT'.
 	cl get.
 	self assert: cl isSuccess.
-	^cl contents
+	^ cl contents
 ]
 
 { #category : 'score engine' }
@@ -337,17 +361,16 @@ News2 >> scoreAllPending [
 { #category : 'score engine' }
 News2 >> scoreOneComp: twoIds [
 
-	| compValues vals scores compNews compOld comp |
+	| compValues vals scores compNews |
 	compValues := self retrieveComp: twoIds.
 	vals := self extractValsFromComp: compValues.
 	scores := self scoreValues: vals.
 	self calcTotalScore: scores.
 	compNews := self compositionNews2: scores.
+	compValues addAll: compNews.
+	self setState: compValues.
 	self halt.
-	"compOld := self cleanupOldComp: compValues."
-	comp := compOld addAll: compNews.
-	self setState: comp.
-	^ comp
+	self putNews2Composition: compValues ehrId: twoIds first
 ]
 
 { #category : 'score' }
