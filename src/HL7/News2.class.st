@@ -73,6 +73,7 @@ News2 >> aqlPending [
 
 	| query query2 aql |
 	query := 'SELECT
+    e/ehr_id/value,
     c/uid/value AS composition_id,
     c/context/start_time/value AS context_time
 FROM
@@ -90,10 +91,11 @@ WHERE
 News2 >> calcTotalScore: scores [
 
 	| fields total |
-	fields := #( #respiration #spo ).
+	"fields := #( #respiration #spo ).
 	total := fields
 		         inject: 0
-		         into: [ :sum :fld | sum + (scores at: fld) ].
+		         into: [ :sum :fld | sum + (scores at: fld) ]."
+		total:= scores values sum.
 	scores at: #total put: total.
 	^scores
 ]
@@ -101,22 +103,23 @@ News2 >> calcTotalScore: scores [
 { #category : 'score engine' }
 News2 >> cleanupOldComp: compValues [
 
-	self halt.
+	self deprecated:'behövs troligen inte.'
 ]
 
 { #category : 'score engine' }
 News2 >> compositionNews2: scores [
 
-	| template result |
+	| template result json |
 	template := self compositionTemplateNews2 .
-	result := template format: scores.
+	json := template format: scores.
+	result := STONJSON fromString: json.
 	^ result
 ]
 
 { #category : 'score engine' }
 News2 >> compositionTemplateNews2 [
 
-	^ '
+	^ '\{
 "news2-christer/national_early_warning_score_2_news2/respiration_rate|ordinal": {respiration},
 "news2-christer/national_early_warning_score_2_news2/respiration_rate|code": "at0021",
 "news2-christer/national_early_warning_score_2_news2/spo_scale_1|ordinal": {spo},
@@ -140,7 +143,7 @@ News2 >> compositionTemplateNews2 [
 "news2-christer/national_early_warning_score_2_news2/clinical_risk_category|code": "at0057",
 "news2-christer/national_early_warning_score_2_news2/clinical_risk_category|terminology": "local",
 "news2-christer/national_early_warning_score_2_news2/time": "2022-02-03T04:05:06.0"
-'
+\}'
 ]
 
 { #category : 'incoming' }
@@ -202,7 +205,14 @@ News2 >> ehrClient [
 	| cl |
 	cl := ZnClient new url:
 		      'https://sandbox.ehrbase.org/ehrbase/rest/openehr/v1/'.
-		cl accept:'application/json'.
+	"cl
+		setBasicAuthenticationUsername: 'ehrbase-user'
+		password: 'SuperSecretPassword'."
+	"cl
+		setBasicAuthenticationUsername: 'christer.assmundsson@vgregion.se'
+		password: '`[15/''k1IR]6>UK/]4p.:LXywrt|.y'."
+	cl headerAt: 'X-Requested-With' put: 'XMLHttpRequest'.
+	cl accept: 'application/json'.
 	^ cl
 ]
 
@@ -214,6 +224,7 @@ News2 >> extractFromHl7: aHl7 [
 	pcd := PcdMessage from: h7.
 	obr7 := ((h7 segment: #OBR) at: 7) last value.
 	timestamp := DateAndTime readYMDHMSfromDigits: obr7 readStream.
+	
 	dict := Dictionary new.
 	dict at: #timestamp put: timestamp asString.
 	dict at: #respiration put: (pcd getIdNo: 151562) value.
@@ -252,14 +263,18 @@ News2 >> findPending [
 	| aql body cl rows ids |
 	aql := self aqlPending.
 	body := ZnEntity json: aql.
-	cl := self ehrClient.
+	cl := self ehrClient forJsonREST.
 	"ehr/{{tolvan}}/composition?format=FLAT&templateId=news2-christer"
 	cl addPath: { 'query'. 'aql' }.
 	cl entity: body.
 	cl post.
 	self assert: cl isSuccess.
-	rows:=((STONJSON fromString: cl contents)	at:#rows).
-	ids:= rows collect: #first.
+	"	rows := (STONJSON fromString: cl contents) at: #rows."
+	rows := cl contents at: #rows.
+	ids := rows collect: [ :row |
+		       {
+			       row first.
+			       row second } ].
 	^ ids
 ]
 
@@ -292,20 +307,23 @@ News2 >> processHl7: aHl7Msg [
 ]
 
 { #category : 'score engine' }
-News2 >> retrieveComp: id [
+News2 >> retrieveComp: twoIds [
+	"{{url}}/rest/openehr/v1/ehr/{{tolvan}}/composition/bf1f29c3-b652-460a-bb53-c0470202c5b8::local.ehrbase.org::1?format=FLAT"
 
-	| aql cl |
+	| cl ehrId compId |
 	self flag: #todo.
-	aql := ''.
-	cl := self ehrClient.
-	"{{url}}/rest/ecis/v1/composition/085f4c40-9c25-4857-b3a3-270ad7ac9026::local.ehrbase.org::1?format=FLAT"
-	cl url: '/rest/ecis/v1/composition'.
-	cl addPath: id;
-	queryAt: 'format' put: 'FLAT'.
-	"cl addPath: {			'composition'.			id }."
+	ehrId := twoIds first.
+	compId := twoIds second.
+	cl := self ehrClient forJsonREST .
+	cl
+		addPath: 'ehr';
+		addPath: ehrId;
+		addPath: 'composition';
+		addPath: compId;
+		queryAt: 'format' put: 'FLAT'.
 	cl get.
 	self assert: cl isSuccess.
-	cl contents
+	^cl contents
 ]
 
 { #category : 'score engine' }
@@ -313,23 +331,23 @@ News2 >> scoreAllPending [
 
 	| allPendingIDs |
 	allPendingIDs := self findPending.
-	allPendingIDs do: [ :id | self scoreOneComp: id ] 
+	allPendingIDs do: [ :ids | self scoreOneComp: ids]
 ]
 
 { #category : 'score engine' }
-News2 >> scoreOneComp: anId [
+News2 >> scoreOneComp: twoIds [
 
 	| compValues vals scores compNews compOld comp |
-	self halt.
-	compValues := self retrieveComp: anId.
+	compValues := self retrieveComp: twoIds.
 	vals := self extractValsFromComp: compValues.
 	scores := self scoreValues: vals.
 	self calcTotalScore: scores.
-compNews:=self	compositionNews2: scores.
-	compOld:= self cleanupOldComp: compValues .
-	comp:= '{',compOld,',',compNews,'}'.
-	^comp
-	
+	compNews := self compositionNews2: scores.
+	self halt.
+	"compOld := self cleanupOldComp: compValues."
+	comp := compOld addAll: compNews.
+	self setState: comp.
+	^ comp
 ]
 
 { #category : 'score' }
@@ -394,4 +412,15 @@ News2 >> scoreValues: vals [
 	dict at: #temperature put: (self scoreTemp: (vals at: #temperature)).
 
 	^ dict
+]
+
+{ #category : 'score engine' }
+News2 >> setState: comp [
+
+	comp
+		at: 'news2-christer/context/processing_status/status|code'
+		put: 'at0003'.
+	comp 
+		at: 'news2-christer/context/processing_status/status|value'
+		put: 'scored'
 ]
