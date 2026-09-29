@@ -263,7 +263,6 @@ News2 >> findPending [
 	cl entity: body.
 	cl post.
 	self assert: cl isSuccess.
-	"	rows := (STONJSON fromString: cl contents) at: #rows."
 	rows := cl contents at: #rows.
 	ids := rows collect: [ :row |
 		       {

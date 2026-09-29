@@ -1,3 +1,12 @@
+"
+startListeningServer
+listenLoop
+serveConnectionOn:
+serveStream:
+executeOneRequestResponseOn:
+receiveMessage:
+
+"
 Class {
 	#name : 'H7MllpTransceiver',
 	#superclass : 'Object',
@@ -44,16 +53,18 @@ H7MllpTransceiver >> disconnect [
 		clientStream := nil ]
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'receiver' }
 H7MllpTransceiver >> executeOneRequestResponseOn: stream [
 	"[0x0B] MSA|AA|... [0x1C][0x0D]"
 
 	| msg |
 	self traceCr: 'starting to receive message'.
-	"	msg := stream upToAll: endMarker."
 	msg := self receiveMessage: stream.
-	msg inspect.
-	self traceCr: 'Message received'.
+	"	msg inspect."
+	(msg first: 4) = 'MSH|'
+		ifTrue: [ News2 new processHl7: msg ]
+		ifFalse: [ msg inspect ].
+	self traceCr: 'Message received'. 
 	stream << startMarker << 'MSA|AA|' << endMarker.
 	stream flush.
 	self traceCr: 'ACK sent'
@@ -66,7 +77,7 @@ startMarker :=String fromByteArray: #[ 11].
 	endMarker := String fromByteArray: #[ 28 13 ]
 ]
 
-{ #category : 'connection' }
+{ #category : 'server' }
 H7MllpTransceiver >> initializeServerSocket [
 	"Set up a new server socket and listen on it"
 
@@ -80,7 +91,7 @@ H7MllpTransceiver >> isRunning [
 	^  process isNotNil and: [  serverSocket isNotNil ]
 ]
 
-{ #category : 'connection' }
+{ #category : 'receiver' }
 H7MllpTransceiver >> listenLoop [
 	"We create a listening Socket, then wait for a connection.
 	After each connection we also check that the listening Socket is still valid
@@ -103,12 +114,15 @@ H7MllpTransceiver >> port [ ^2575
 H7MllpTransceiver >> receiveAck [
 	"[0x0B] MSA|AA|... [0x1C][0x0D]"
 
-	|  msg |
-		msg := clientStream upToAll: endMarker.
-	msg inspect
+	| msg |
+	msg := clientStream upToAll: endMarker.
+	self assert: msg first = startMarker first.
+	msg := msg allButFirst.
+"	msg inspect"
+	self assert: msg='MSA|AA|'
 ]
 
-{ #category : 'sender' }
+{ #category : 'receiver' }
 H7MllpTransceiver >> receiveMessage: anInStream [
 
 	| msg byte |
@@ -119,16 +133,16 @@ H7MllpTransceiver >> receiveMessage: anInStream [
 		       self
 			       trace: byte;
 			       trace: ' '.
-		       		       byte = endMarker first asciiValue ] whileFalse:[s << byte.] ].
+		       byte = endMarker first asciiValue ] whileFalse: [ s << byte ] ].
 	byte := anInStream next.
 	byte = endMarker last asciiValue ifFalse: [
 		Error signal: 'fel tecken efter stop marker' ].
 	self traceCr: msg.
-	msg inspect.
-	^ msg  allButFirst asString.
+	"msg inspect."
+	^ msg allButFirst asString
 ]
 
-{ #category : 'connection' }
+{ #category : 'server' }
 H7MllpTransceiver >> releaseServerSocket [
 	"Release our server socket"
 	| address port |
@@ -155,7 +169,7 @@ newMsg:= aMsg copyReplaceAll: String crlf with:  String cr.
 	self receiveAck
 ]
 
-{ #category : 'connection' }
+{ #category : 'receiver' }
 H7MllpTransceiver >> serveConnectionOn: listeningSocket [
 	"We wait up to acceptWaitTimeout seconds for an incoming connection.
 	If we get one we wrap it in a SocketStream and #executeOneRequestResponseOn: on it.
@@ -165,15 +179,19 @@ H7MllpTransceiver >> serveConnectionOn: listeningSocket [
 	socket := listeningSocket waitForAcceptFor: self acceptWaitTimeout.
 	socket ifNil: [ ^ self "noteAcceptWaitTimedOut" ].
 	stream := self socketStreamOn: socket.
-	[[ "[	self withDynamicVariablesDo: " "]" self serveStream: stream ] ensure: [ self traceCr:'logConnectionClosed'.
-		stream close ]]
-		ifCurtailed: [ socket destroy ]
+	[
+	[ "[	self withDynamicVariablesDo: " "]" 
+		
+		self serveStream: stream ]
+		ensure: [
+			self traceCr: 'logConnectionClosed'.
+			stream close ] ] ifCurtailed: [ socket destroy ]
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'receiver' }
 H7MllpTransceiver >> serveStream: stream [
 
- [ self executeOneRequestResponseOn: stream ] repeat 
+	"[" self executeOneRequestResponseOn: stream "] repeat"
 ]
 
 { #category : 'accessing' }
@@ -194,7 +212,7 @@ H7MllpTransceiver >> serverProcessName [
 				  << id ]" ]
 ]
 
-{ #category : 'connection' }
+{ #category : 'sender' }
 H7MllpTransceiver >> socketStreamOn: socket [
 	"self logConnectionAccepted: socket."
 
@@ -207,7 +225,7 @@ H7MllpTransceiver >> socketStreamOn: socket [
 	^stream
 ]
 
-{ #category : 'connection' }
+{ #category : 'sender' }
 H7MllpTransceiver >> startListeningServer [
 
 	process := [ [ self listenLoop ] repeat ]
@@ -215,7 +233,7 @@ H7MllpTransceiver >> startListeningServer [
 		           named: self serverProcessName
 ]
 
-{ #category : 'connection' }
+{ #category : 'sender' }
 H7MllpTransceiver >> startReceivingServer [
 
 self flag:'incomplete'.
@@ -224,7 +242,7 @@ self flag:'incomplete'.
 		           named: self serverProcessName
 ]
 
-{ #category : 'connection' }
+{ #category : 'server' }
 H7MllpTransceiver >> stopServer [
 	"Stop me. I will stop listening on my port for incoming connections.
 	Does nothing when I am not running"
