@@ -196,9 +196,10 @@ News2 >> createValueCompFrom: dict [
 { #category : 'private' }
 News2 >> ehrClient [
 
-	| cl |
-	cl := ZnClient new url:
-		      'https://sandbox.ehrbase.org/ehrbase/rest/openehr/v1/'.
+	| cl url |
+	url:='https://sandbox.ehrbase.org/ehrbase/rest/openehr/v1/'.
+	url:='http://vgas5954.vgregion.se:8081/ehrbase/rest/openehr/v1/'.
+	cl := ZnClient new url:url.		      
 	"cl
 		setBasicAuthenticationUsername: 'ehrbase-user'
 		password: 'SuperSecretPassword'."
@@ -273,8 +274,8 @@ News2 >> findPending [
 
 { #category : 'private' }
 News2 >> getEhrId: patient_id [
-
-	^'0d3d3cdf-3a64-40f4-8f3b-5fcd51ec6c7d'
+"tolvan i ehrBase sandbox: '0d3d3cdf-3a64-40f4-8f3b-5fcd51ec6c7d'"
+	^ '118c83af-7b05-4539-987b-bb0b30198bf4' "'0d3d3cdf-3a64-40f4-8f3b-5fcd51ec6c7d'"
 ]
 
 { #category : 'incoming' }
