@@ -39,27 +39,30 @@ News2App >> renderContentOn: html [
 		html tableHead: [
 			html tableRow: [
 				html tableHeading: 'Index'.
-				html tableHeading: 'Item Value' ] ] .
-		html tableBody: [ 
-		unscored doWithIndex: [ :item :index |
-			html tableRow: [ 
-				html tableData: index.
-				html tableData: ( item)second ] ] ]].
+				html tableHeading: 'comp_id'.
+				 ] ].
+		html tableBody: [
+			unscored doWithIndex: [ :item :index |
+				html tableRow: [
+					html tableData: index.
+					html tableData: item second ] ] ] ].
 	html div.
 	html space.
 	html anchor
 		callback: [ self updateScored ];
 		with: 'Refresh scored'.
-		html table with: [
+	html table with: [
 		html tableHead: [
 			html tableRow: [
 				html tableHeading: 'Index'.
-				html tableHeading: 'Item Value' ] ] .
-		html tableBody: [ 
-		scored doWithIndex: [ :item :index |
-			html tableRow: [ 
-				html tableData: index.
-				html tableData: ( item)second ] ] ]].
+				html tableHeading: 'comp id' .
+				html tableHeading: 'timestamp'.html tableHeading: 'score'] ].
+		html tableBody: [
+			scored doWithIndex: [ :item :index |
+				html tableRow: [
+					html tableData: index.
+					html tableData: item second .html tableData: item third.
+					html tableData: item fifth] ] ] ]
 ]
 
 { #category : 'initialization' }

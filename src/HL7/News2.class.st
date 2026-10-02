@@ -94,7 +94,9 @@ News2 >> aqlScored [
 	query := 'SELECT
     e/ehr_id/value,
     c/uid/value AS composition_id,
-    c/context/start_time/value AS context_time
+    c/context/start_time/value AS context_time,
+    s/items[at0001]/value/value AS status_text,
+    news2/data[at0001]/events[at0002]/data[at0003]/items[at0028]/value/magnitude as news_score
 FROM
     EHR e
     CONTAINS COMPOSITION c
