@@ -62,9 +62,10 @@ News2File class >> stop [
 { #category : 'accessing' }
 News2File >> processFiles [
 
-	|  folder |
+	| folder |
 	folder := 'C:\Pharo\images\HL7 - 12\inFolder' asFileReference.
-	folder files do: [ :file | News2 new processHl7: file contents ]
+	folder files do: [ :file | News2 new processHl7: file contents ].
+	
 ]
 
 { #category : 'accessing' }
@@ -72,10 +73,11 @@ News2File >> start [
 
 	service := TKTParameterizableService new.
 	service name: 'HL7 watcher service'.
-	service onSetUpDo: [ Transcript show: 'File watcher started' ].
-	service onTearDownDo: [ Transcript show: 'File watcher finished' ].
+	"service onSetUpDo: [ Transcript show: 'File watcher started' ].
+	service onTearDownDo: [ Transcript show: 'File watcher finished' ]."
 	service step: [ self processFiles ].
- 
+	service stepDelay: 5 seconds. 
+
 	service start
 ]
 
