@@ -87,6 +87,25 @@ WHERE
 	^ aql
 ]
 
+{ #category : 'api' }
+News2 >> aqlScored [
+
+	| query query2 aql |
+	query := 'SELECT
+    e/ehr_id/value,
+    c/uid/value AS composition_id,
+    c/context/start_time/value AS context_time
+FROM
+    EHR e
+    CONTAINS COMPOSITION c
+WHERE
+    c/archetype_details/template_id/value = ''news2-christer''
+    AND c/context/other_context[at0001]/items[openEHR-EHR-CLUSTER.processing_status.v0]/items[at0001]/value/defining_code/code_string = ''at0003'' '.
+	query2 := query copyReplaceAll: String cr with: '\r'.
+	aql := '{ "q": "' , query2 , '"}'.
+	^ aql
+]
+
 { #category : 'score' }
 News2 >> calcTotalScore: scores [
 
@@ -197,9 +216,9 @@ News2 >> createValueCompFrom: dict [
 News2 >> ehrClient [
 
 	| cl url |
-	url:='https://sandbox.ehrbase.org/ehrbase/rest/openehr/v1/'.
-	url:='http://vgas5954.vgregion.se:8081/ehrbase/rest/openehr/v1/'.
-	cl := ZnClient new url:url.		      
+	"url := 'https://sandbox.ehrbase.org/ehrbase/rest/openehr/v1/'."
+	url := 'http://vgas5954.vgregion.se:8081/ehrbase/rest/openehr/v1/'.
+	cl := ZnClient new url: url.
 	"cl
 		setBasicAuthenticationUsername: 'ehrbase-user'
 		password: 'SuperSecretPassword'."
@@ -272,10 +291,44 @@ News2 >> findPending [
 	^ ids
 ]
 
+{ #category : 'api' }
+News2 >> findScored [
+
+	| aql body cl rows ids |
+	aql := self aqlPending.
+	body := ZnEntity json: aql.
+	cl := self ehrClient forJsonREST.
+	"ehr/{{tolvan}}/composition?format=FLAT&templateId=news2-christer"
+	cl addPath: { 'query'. 'aql' }.
+	cl entity: body.
+	cl post.
+	self assert: cl isSuccess.
+	rows := cl contents at: #rows.
+	ids := rows collect: [ :row |
+		       {
+			       row first.
+			       row second } ].
+	^ ids
+]
+
 { #category : 'private' }
 News2 >> getEhrId: patient_id [
-"tolvan i ehrBase sandbox: '0d3d3cdf-3a64-40f4-8f3b-5fcd51ec6c7d'"
-	^ '118c83af-7b05-4539-987b-bb0b30198bf4' "'0d3d3cdf-3a64-40f4-8f3b-5fcd51ec6c7d'"
+	"tolvan i ehrBase sandbox: '0d3d3cdf-3a64-40f4-8f3b-5fcd51ec6c7d'"
+"tolvan i vgr ehrbase"
+	^ '118c83af-7b05-4539-987b-bb0b30198bf4' 
+]
+
+{ #category : 'api' }
+News2 >> getScored [
+
+	
+]
+
+{ #category : 'api' }
+News2 >> getUnscored [
+
+	
+^self findPending. 
 ]
 
 { #category : 'incoming' }

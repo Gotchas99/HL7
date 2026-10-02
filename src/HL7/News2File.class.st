@@ -64,8 +64,9 @@ News2File >> processFiles [
 
 	| folder |
 	folder := 'C:\Pharo\images\HL7 - 12\inFolder' asFileReference.
-	folder files do: [ :file | News2 new processHl7: file contents ].
-	
+	folder files do: [ :file |
+		News2 new processHl7: file contents. 
+		file delete ]
 ]
 
 { #category : 'accessing' }
