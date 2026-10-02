@@ -1,9 +1,9 @@
 Class {
 	#name : 'News2App',
 	#superclass : 'WAComponent',
-	#category : 'HL7-Other',
+	#category : 'HL7-NEWS2',
 	#package : 'HL7',
-	#tag : 'Other'
+	#tag : 'NEWS2'
 }
 
 { #category : 'class initialization' }
