@@ -69,6 +69,42 @@ News2 class >> sample_composition [
 ]
 
 { #category : 'score engine' }
+News2 >> addFeederAuditScoring [
+
+'{
+  "ctx/feeder_audit/originating_system_audit/system_id": "HIS_LAB_SYSTEM",
+  "ctx/feeder_audit/originating_system_audit/time_committed": "2026-10-02T14:30:00Z",
+  "ctx/feeder_audit/originating_system_audit/version_id": "v1.2.0",
+
+  "ctx/feeder_audit/originating_system_item_ids:0/id": "MSG-20261002-99841",
+  "ctx/feeder_audit/originating_system_item_ids:0/type": "HL7_MSH_10",
+  "ctx/feeder_audit/originating_system_item_ids:0/issuer": "Central Hospital",
+
+  "ctx/feeder_audit/feeder_system_audit/system_id": "apache_nifi_integration_hub",
+  "ctx/feeder_audit/feeder_system_audit/time_committed": "2026-10-02T14:35:00Z",
+
+  "ctx/feeder_audit/feeder_system_item_ids:0/id": "NIFI-FLOW-88419",
+  "ctx/feeder_audit/feeder_system_item_ids:0/type": "FLOWFILE_ID",
+
+  "ctx/feeder_audit/original_content/_type": "DV_PARSED",
+  "ctx/feeder_audit/original_content/media_type": "text/plain",
+  "ctx/feeder_audit/original_content/value": "MSH|^~\\&|HIS_LAB_SYSTEM|..."
+}'.
+
+	'"news2-christer/pulse_oximetry/_feeder_audit/originating_system_audit/system_id": "Bedside_Monitor_Bed4",'.
+	'"ctx/feeder_audit/originating_system_audit/time_committed": "2026-10-02T14:30:00Z",
+  "ctx/feeder_audit/originating_system_audit/version_id": "v1.2.0",'
+]
+
+{ #category : 'incoming' }
+News2 >> addFeederAuditTransformer [
+
+	'"news2-christer/pulse_oximetry/_feeder_audit/originating_system_audit/system_id": "Bedside_Monitor_Bed4",'
+.	'"ctx/feeder_audit/originating_system_audit/time_committed": "2026-10-02T14:30:00Z",
+  "ctx/feeder_audit/originating_system_audit/version_id": "v1.2.0",'
+]
+
+{ #category : 'score engine' }
 News2 >> aqlPending [
 
 	| query query2 aql |
@@ -90,41 +126,47 @@ WHERE
 { #category : 'api' }
 News2 >> aqlScored [
 
-	| query query2 aql |
+	| query query2 aql query3 |
 	query := 'SELECT
-    e/ehr_id/value,
+ e/ehr_id/value AS ehr_id,
     c/uid/value AS composition_id,
     c/context/start_time/value AS context_time,
     s/items[at0001]/value/value AS status_text,
-    news2/data[at0001]/events[at0002]/data[at0003]/items[at0028]/value/magnitude as news_score
+    news2/data[at0001]/events[at0002]/data[at0003]/items[at0028]/value/magnitude AS news_score
 FROM
     EHR e
-    CONTAINS COMPOSITION c
+CONTAINS COMPOSITION c[openEHR-EHR-COMPOSITION.encounter.v1]
+    CONTAINS (
+        CLUSTER s[openEHR-EHR-CLUSTER.processing_status.v0]
+        and OBSERVATION news2[openEHR-EHR-OBSERVATION.news2.v1]
+    )
 WHERE
     c/archetype_details/template_id/value = ''news2-christer''
-    AND c/context/other_context[at0001]/items[openEHR-EHR-CLUSTER.processing_status.v0]/items[at0001]/value/defining_code/code_string = ''at0003'' '.
+    AND 
+	 s/items[at0001]/value/defining_code/code_string = ''at0003'' '.
+
 	query2 := query copyReplaceAll: String cr with: '\r'.
-	aql := '{ "q": "' , query2 , '"}'.
+	query3 := query2 copyReplaceAll: String tab with: '   '.
+	aql := '{ "q": "' , query3 , '"}'.
 	^ aql
+]
+
+{ #category : 'score' }
+News2 >> calcRisk: scores [
+
+	(scores at: #total) <= 4 ifTrue: [ ^ 'Låg' ].
+	scores values max = 3 ifTrue: [ ^ 'Låg/medium' ]. 
+	(scores at: #total) <= 6 ifTrue: [ ^ 'Medium' ].
+	^ 'Hög'
 ]
 
 { #category : 'score' }
 News2 >> calcTotalScore: scores [
 
-	| fields total |
-	"fields := #( #respiration #spo ).
-	total := fields
-		         inject: 0
-		         into: [ :sum :fld | sum + (scores at: fld) ]."
-		total:= scores values sum.
+	|  total |
+	total := scores values sum.
 	scores at: #total put: total.
-	^scores
-]
-
-{ #category : 'score engine' }
-News2 >> cleanupOldComp: compValues [
-
-	self deprecated:'behövs troligen inte.'
+	^ scores
 ]
 
 { #category : 'score engine' }
@@ -214,6 +256,26 @@ News2 >> createValueCompFrom: dict [
 	^ '{',result,'}'
 ]
 
+{ #category : 'as yet unclassified' }
+News2 >> deleteAllScoredEhr [
+
+	| allScoredIds |
+	self halt.
+	allScoredIds := self findScored.
+	allScoredIds do: [ :twoIds |
+		| cl ehrId compId |
+		ehrId := twoIds first.
+		compId := twoIds second.
+		cl := self ehrClient .
+		cl
+			addPath: 'ehr';
+			addPath: ehrId;
+			addPath: 'composition';
+			addPath: compId.
+		cl delete.
+		self assert: cl isSuccess ]
+]
+
 { #category : 'private' }
 News2 >> ehrClient [
 
@@ -224,9 +286,7 @@ News2 >> ehrClient [
 	"cl
 		setBasicAuthenticationUsername: 'ehrbase-user'
 		password: 'SuperSecretPassword'."
-	"cl
-		setBasicAuthenticationUsername: 'christer.assmundsson@vgregion.se'
-		password: '`[15/''k1IR]6>UK/]4p.:LXywrt|.y'."
+	cl beOneShot .
 	cl headerAt: 'X-Requested-With' put: 'XMLHttpRequest'.
 	cl accept: 'application/json'.
 	^ cl
@@ -297,7 +357,7 @@ News2 >> findPending [
 News2 >> findScored [
 
 	| aql body cl rows ids |
-	aql := self aqlPending.
+	aql := self aqlScored .
 	body := ZnEntity json: aql.
 	cl := self ehrClient forJsonREST.
 	"ehr/{{tolvan}}/composition?format=FLAT&templateId=news2-christer"
@@ -323,7 +383,9 @@ News2 >> getEhrId: patient_id [
 { #category : 'api' }
 News2 >> getScored [
 
-	
+	| ids |
+	ids := self findScored.
+	^ids
 ]
 
 { #category : 'api' }
@@ -366,20 +428,22 @@ News2 >> processHl7: aHl7Msg [
 News2 >> putNews2Composition: comp ehrId: anEhrId [
 
 	| cl versionedUid uid |
-	versionedUid:=(comp at:'news2-christer/_uid').
-	uid:= versionedUid copyUpTo: $:.
-	cl := self ehrClient forJsonREST ;contentReader:nil.
+	versionedUid := comp at: 'news2-christer/_uid'.
+	uid := versionedUid copyUpTo: $:.
+	cl := self ehrClient
+		      forJsonREST;
+		      contentReader: nil. 
 	"ehr/{{tolvan}}/composition?format=FLAT&templateId=news2-christer"
+	cl addPath: {
+			'ehr'.
+			anEhrId.
+			'composition'.
+			uid }.
 	cl
-		addPath: {
-				'ehr'.
-				anEhrId.
-				'composition'.
-				uid }.
-cl		queryAt: 'format' put: 'FLAT';
+		queryAt: 'format' put: 'FLAT';
 		queryAt: 'templateId' put: 'news2-christer'.
-		cl headerAt: 'If-Match' put:versionedUid. 
-		
+	cl headerAt: 'If-Match' put: versionedUid.
+
 	cl contents: comp.
 	cl put.
 	self assert: cl isSuccess.
@@ -421,10 +485,10 @@ News2 >> scoreOneComp: twoIds [
 	vals := self extractValsFromComp: compValues.
 	scores := self scoreValues: vals.
 	self calcTotalScore: scores.
+	scores at:#risk put: (self calcRisk: scores).
 	compNews := self compositionNews2: scores.
 	compValues addAll: compNews.
 	self setState: compValues.
-	self halt.
 	self putNews2Composition: compValues ehrId: twoIds first
 ]
 
@@ -488,7 +552,7 @@ News2 >> scoreValues: vals [
 	dict at: #systolic put: (self scoreSystolic: (vals at: #systolic)).
 	dict at: #pulse put: (self scorePulse: (vals at: #pulse)).
 	dict at: #temperature put: (self scoreTemp: (vals at: #temperature)).
-
+	
 	^ dict
 ]
 

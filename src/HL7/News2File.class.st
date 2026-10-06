@@ -62,10 +62,10 @@ News2File class >> stop [
 { #category : 'accessing' }
 News2File >> processFiles [
 
-	| folder |
+	| folder  |
 	folder := 'C:\Pharo\images\HL7 - 12\inFolder' asFileReference.
 	folder files do: [ :file |
-		News2 new processHl7: file contents. 
+		News2 new processHl7: file contents.
 		file delete ]
 ]
 

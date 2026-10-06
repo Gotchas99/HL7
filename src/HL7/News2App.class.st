@@ -18,19 +18,15 @@ News2App class >> initialize [
 { #category : 'initialization' }
 News2App >> initialize [
 
-	super initialize
-.	unscored:=#(#abc #def).scored:=#().
+	super initialize.
+	unscored := #(  ).
+	scored := #(  )
 ]
 
 { #category : 'initialization' }
 News2App >> renderContentOn: html [
 
-	| count |
-	"count := 42."
 	html heading: 'Hello from Seaside!'.
-	"html paragraph: [
-		html text: 'Current Count: '.
-		html strong: count ]."
 
 	html anchor
 		callback: [ self updateUnscored ];
@@ -39,15 +35,19 @@ News2App >> renderContentOn: html [
 		html tableHead: [
 			html tableRow: [
 				html tableHeading: 'Index'.
-				html tableHeading: 'comp_id'.
-				 ] ].
+				html tableHeading: 'comp_id' ] ].
 		html tableBody: [
 			unscored doWithIndex: [ :item :index |
 				html tableRow: [
 					html tableData: index.
 					html tableData: item second ] ] ] ].
 	html div.
-	html space.
+
+	html anchor
+		callback: [ self scoreAll ];
+		with: 'Run scoring engine'.
+	html div.
+
 	html anchor
 		callback: [ self updateScored ];
 		with: 'Refresh scored'.
@@ -55,21 +55,32 @@ News2App >> renderContentOn: html [
 		html tableHead: [
 			html tableRow: [
 				html tableHeading: 'Index'.
-				html tableHeading: 'comp id' .
-				html tableHeading: 'timestamp'.html tableHeading: 'score'] ].
+				html tableHeading: 'comp id'.
+				html tableHeading: 'timestamp'.
+				html tableHeading: 'score' ] ].
 		html tableBody: [
 			scored doWithIndex: [ :item :index |
 				html tableRow: [
 					html tableData: index.
-					html tableData: item second .html tableData: item third.
-					html tableData: item fifth] ] ] ]
+					html tableData: item second.
+					"html tableData: item third.
+					html tableData: item fifth" ] ] ] ]
+]
+
+{ #category : 'initialization' }
+News2App >> scoreAll [
+
+	News2 new scoreAllPending .
 ]
 
 { #category : 'initialization' }
 News2App >> updateScored [
+
+	scored := News2 new getScored 
 ]
 
 { #category : 'initialization' }
 News2App >> updateUnscored [
-	unscored := News2 new  findPending
+
+	unscored := News2 new getUnscored 
 ]
