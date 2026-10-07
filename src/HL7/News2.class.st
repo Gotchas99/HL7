@@ -68,18 +68,6 @@ News2 class >> sample_composition [
 }'.
 ]
 
-{ #category : 'score engine' }
-News2 >> addFeederAuditScoring [
-
-	'{
-  
-}'.
-
-	'"news2-christer/pulse_oximetry/_feeder_audit/originating_system_audit/system_id": "Bedside_Monitor_Bed4",'.
-	'"ctx/feeder_audit/originating_system_audit/time_committed": "2026-10-02T14:30:00Z",
-  "ctx/feeder_audit/originating_system_audit/version_id": "v1.2.0",'
-]
-
 { #category : 'incoming' }
 News2 >> addFeederAuditTransformer [
 
@@ -249,7 +237,7 @@ News2 >> createValueCompFrom: dict [
 	| template result |
 	template := self compositionTemplateValues.
 	result := template format: dict.
-	^ '{',result,'}'
+	^  result 
 ]
 
 { #category : 'as yet unclassified' }
@@ -291,7 +279,7 @@ News2 >> ehrClient [
 { #category : 'incoming' }
 News2 >> extractFeeder: aHl7Msg [
 
-	| h7 pcd dict timestamp obr7 obx18 equip msh10 |
+	| h7 pcd dict timestamp obr7 obx18 equip msh10 originalMsg |
 	h7 := (H7Parser on: aHl7Msg) parse.
 	pcd := PcdMessage from: h7.
 	obr7 := ((h7 segment: #OBR) at: 7) last value.
@@ -299,14 +287,16 @@ News2 >> extractFeeder: aHl7Msg [
 	obx18 := ((h7 segment: #OBX) at: 18) last value.
 	equip := (' - ' split: obx18) first.
 	msh10 := (h7 msh at: 10) last value.
+	originalMsg:= aHl7Msg copyReplaceAll: String cr with: '\r'.
+	originalMsg:= originalMsg copyReplaceAll: '"' with: '\"'.
 
 	dict := Dictionary new.
 	dict at: #timestamp put: timestamp asString.
 	dict at: #originating put: equip.
 	dict at: #msh10 put: msh10.
 	dict at: #now put: DateAndTime now asString.
-	dict at: #hl7 put: aHl7Msg.
-	
+	dict at: #hl7 put: originalMsg.
+
 	^ dict
 ]
 
@@ -439,9 +429,12 @@ News2 >> processHl7: aHl7Msg [
 	| inner dict feeder feederDict |
 	dict := self extractFromHl7: aHl7Msg.
 	feederDict := self extractFeeder: aHl7Msg.
+
 	inner := self createValueCompFrom: dict.
 	feeder := self addFeederAuditTransformer format: feederDict.
-	self postValueComposition: (inner,',',feeder) ehrId: (dict at: #ehrid)
+	self
+		postValueComposition: '{' , inner , ',' , feeder,'}'
+		ehrId: (dict at: #ehrid)
 ]
 
 { #category : 'score engine' }
@@ -574,6 +567,24 @@ News2 >> scoreValues: vals [
 	dict at: #temperature put: (self scoreTemp: (vals at: #temperature)).
 	
 	^ dict
+]
+
+{ #category : 'score engine' }
+News2 >> setFeeder: comp [
+
+	self flag: 'fix path'.
+	comp
+		at:
+			'news2-christer/pulse_oximetry/_feeder_audit/originating_system_audit/system_id'
+		put: 'prototype scoring engine';
+		
+		at:
+			'news2-christer/pulse_oximetry/_feeder_audit/originating_system_audit/time_committed'
+		put: DateAndTime now asString;
+		
+		at:
+			'news2-christer/pulse_oximetry/_feeder_audit/originating_system_audit/version_id'
+		put: 'v:0.1'
 ]
 
 { #category : 'score engine' }
