@@ -71,24 +71,8 @@ News2 class >> sample_composition [
 { #category : 'score engine' }
 News2 >> addFeederAuditScoring [
 
-'{
-  "ctx/feeder_audit/originating_system_audit/system_id": "HIS_LAB_SYSTEM",
-  "ctx/feeder_audit/originating_system_audit/time_committed": "2026-10-02T14:30:00Z",
-  "ctx/feeder_audit/originating_system_audit/version_id": "v1.2.0",
-
-  "ctx/feeder_audit/originating_system_item_ids:0/id": "MSG-20261002-99841",
-  "ctx/feeder_audit/originating_system_item_ids:0/type": "HL7_MSH_10",
-  "ctx/feeder_audit/originating_system_item_ids:0/issuer": "Central Hospital",
-
-  "ctx/feeder_audit/feeder_system_audit/system_id": "apache_nifi_integration_hub",
-  "ctx/feeder_audit/feeder_system_audit/time_committed": "2026-10-02T14:35:00Z",
-
-  "ctx/feeder_audit/feeder_system_item_ids:0/id": "NIFI-FLOW-88419",
-  "ctx/feeder_audit/feeder_system_item_ids:0/type": "FLOWFILE_ID",
-
-  "ctx/feeder_audit/original_content/_type": "DV_PARSED",
-  "ctx/feeder_audit/original_content/media_type": "text/plain",
-  "ctx/feeder_audit/original_content/value": "MSH|^~\\&|HIS_LAB_SYSTEM|..."
+	'{
+  
 }'.
 
 	'"news2-christer/pulse_oximetry/_feeder_audit/originating_system_audit/system_id": "Bedside_Monitor_Bed4",'.
@@ -99,9 +83,21 @@ News2 >> addFeederAuditScoring [
 { #category : 'incoming' }
 News2 >> addFeederAuditTransformer [
 
-	'"news2-christer/pulse_oximetry/_feeder_audit/originating_system_audit/system_id": "Bedside_Monitor_Bed4",'
-.	'"ctx/feeder_audit/originating_system_audit/time_committed": "2026-10-02T14:30:00Z",
-  "ctx/feeder_audit/originating_system_audit/version_id": "v1.2.0",'
+	^ '
+  "ctx/feeder_audit/originating_system_audit/system_id": "{originating}",
+  "ctx/feeder_audit/originating_system_audit/time_committed": "{timestamp}",
+  
+  "ctx/feeder_audit/originating_system_item_ids:0/id": "{msh10}",
+  "ctx/feeder_audit/originating_system_item_ids:0/type": "HL7_MSH_10",
+  "ctx/feeder_audit/originating_system_item_ids:0/issuer": "CHA_NAL",
+
+  "ctx/feeder_audit/feeder_system_audit/system_id": "prototyp-transformer",
+  "ctx/feeder_audit/feeder_system_audit/time_committed": "{now}",
+
+  "ctx/feeder_audit/original_content/_type": "DV_PARSED",
+  "ctx/feeder_audit/original_content/media_type": "text/plain",
+  "ctx/feeder_audit/original_content/value": "{hl7}"
+'
 ]
 
 { #category : 'score engine' }
@@ -293,6 +289,28 @@ News2 >> ehrClient [
 ]
 
 { #category : 'incoming' }
+News2 >> extractFeeder: aHl7Msg [
+
+	| h7 pcd dict timestamp obr7 obx18 equip msh10 |
+	h7 := (H7Parser on: aHl7Msg) parse.
+	pcd := PcdMessage from: h7.
+	obr7 := ((h7 segment: #OBR) at: 7) last value.
+	timestamp := DateAndTime readYMDHMSfromDigits: obr7 readStream.
+	obx18 := ((h7 segment: #OBX) at: 18) last value.
+	equip := (' - ' split: obx18) first.
+	msh10 := (h7 msh at: 10) last value.
+
+	dict := Dictionary new.
+	dict at: #timestamp put: timestamp asString.
+	dict at: #originating put: equip.
+	dict at: #msh10 put: msh10.
+	dict at: #now put: DateAndTime now asString.
+	dict at: #hl7 put: aHl7Msg.
+	
+	^ dict
+]
+
+{ #category : 'incoming' }
 News2 >> extractFromHl7: aHl7 [
 
 	| h7 pcd dict patient_id timestamp obr7 |
@@ -399,16 +417,16 @@ News2 >> getUnscored [
 News2 >> postValueComposition: inner ehrId: anEhrId [
 
 	| comp cl |
-	comp := ZnEntity json: inner.
 	cl := self ehrClient.
 	"ehr/{{tolvan}}/composition?format=FLAT&templateId=news2-christer"
 	cl
-		addPath: { 
+		addPath: {
 				'ehr'.
-				anEhrId.
+				anEhrId. 
 				'composition' };
 		queryAt: 'format' put: 'FLAT';
 		queryAt: 'templateId' put: 'news2-christer'.
+	comp := ZnEntity json: inner.
 	cl entity: comp.
 	cl post.
 	self assert: cl isSuccess.
@@ -418,10 +436,12 @@ News2 >> postValueComposition: inner ehrId: anEhrId [
 { #category : 'incoming' }
 News2 >> processHl7: aHl7Msg [
 
-	| inner  dict |
+	| inner dict feeder feederDict |
 	dict := self extractFromHl7: aHl7Msg.
+	feederDict := self extractFeeder: aHl7Msg.
 	inner := self createValueCompFrom: dict.
-	self postValueComposition: inner ehrId: (dict at: #ehrid)
+	feeder := self addFeederAuditTransformer format: feederDict.
+	self postValueComposition: (inner,',',feeder) ehrId: (dict at: #ehrid)
 ]
 
 { #category : 'score engine' }
