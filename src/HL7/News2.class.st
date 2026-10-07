@@ -433,8 +433,9 @@ News2 >> processHl7: aHl7Msg [
 	inner := self createValueCompFrom: dict.
 	feeder := self addFeederAuditTransformer format: feederDict.
 	self
-		postValueComposition: '{' , inner , ',' , feeder,'}'
-		ehrId: (dict at: #ehrid)
+		postValueComposition: '{' , inner , ',' , feeder , '}'
+		ehrId: (dict at: #ehrid).
+	self traceCr:'Stored one comp from HL7'
 ]
 
 { #category : 'score engine' }
@@ -498,11 +499,13 @@ News2 >> scoreOneComp: twoIds [
 	vals := self extractValsFromComp: compValues.
 	scores := self scoreValues: vals.
 	self calcTotalScore: scores.
-	scores at:#risk put: (self calcRisk: scores).
+	scores at: #risk put: (self calcRisk: scores).
 	compNews := self compositionNews2: scores.
 	compValues addAll: compNews.
 	self setState: compValues.
-	self putNews2Composition: compValues ehrId: twoIds first
+	self setFeeder: compValues .
+	self putNews2Composition: compValues ehrId: twoIds first.
+	self traceCr:'Scored one comp'
 ]
 
 { #category : 'score' }
