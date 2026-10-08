@@ -66,7 +66,7 @@ H7Field >> on: aString [
 H7Field >> printOn: aStream [
 
 	| tmp |
-	tmp := comps reduce:[:a :b| a , ' * ',b]..
+	tmp := comps reduce: [ :a :b | a , ' ^ ' , b ].
 	aStream << tmp
 	"	tmp size = 1
 		ifTrue: [ ^ tmp first ]

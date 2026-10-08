@@ -157,7 +157,8 @@ News2 >> calcTotalScore: scores [
 News2 >> compositionNews2: scores [
 
 	| template result json |
-	template := self compositionTemplateNews2 .
+	scores at:#timestamp_news put: DateAndTime now asString.
+	template := self compositionTemplateNews2.
 	json := template format: scores.
 	result := STONJSON fromString: json.
 	^ result
@@ -189,7 +190,7 @@ News2 >> compositionTemplateNews2 [
 "news2-christer/national_early_warning_score_2_news2/clinical_risk_category|value": "Low",
 "news2-christer/national_early_warning_score_2_news2/clinical_risk_category|code": "at0057",
 "news2-christer/national_early_warning_score_2_news2/clinical_risk_category|terminology": "local",
-"news2-christer/national_early_warning_score_2_news2/time": "2022-02-03T04:05:06.0"
+"news2-christer/national_early_warning_score_2_news2/time": "{timestamp_news}"
 \}'
 ]
 
@@ -308,7 +309,7 @@ News2 >> extractFromHl7: aHl7 [
 	pcd := PcdMessage from: h7.
 	obr7 := ((h7 segment: #OBR) at: 7) last value.
 	timestamp := DateAndTime readYMDHMSfromDigits: obr7 readStream.
-	
+
 	dict := Dictionary new.
 	dict at: #timestamp put: timestamp asString.
 	dict at: #respiration put: (pcd getIdNo: 151562) value.
@@ -316,7 +317,7 @@ News2 >> extractFromHl7: aHl7 [
 	dict at: #systolic put: (pcd getIdNo: 150037) value.
 	dict at: #pulse put: (pcd getIdNo: 149514) value.
 	dict at: #temperature put: (pcd getIdNo: 188420) value.
-	patient_id := ((pcd hl7 segment: #pid) at: 2) third.
+	patient_id := ((h7 pid) patientId ) .
 	"namn: ((pcd hl7 segment: #pid) at:5) third."
 	dict at: #ehrid put: (self getEhrId: patient_id).
 
@@ -400,8 +401,10 @@ News2 >> getScored [
 { #category : 'api' }
 News2 >> getUnscored [
 
-	
-^self findPending. 
+	| ids comps |
+	ids:= self findPending.
+	comps := ids collect: [ :twoIds | self retrieveComp: twoIds ].
+	^ comps
 ]
 
 { #category : 'incoming' }
@@ -504,9 +507,10 @@ News2 >> scoreOneComp: twoIds [
 	compNews := self compositionNews2: scores.
 	compValues addAll: compNews.
 	self setState: compValues.
-	self setFeeder: compValues .
+	"not working:
+	self setFeeder: compValues."
 	self putNews2Composition: compValues ehrId: twoIds first.
-	self traceCr:'Scored one comp'
+	self traceCr: 'Scored one comp'
 ]
 
 { #category : 'score' }

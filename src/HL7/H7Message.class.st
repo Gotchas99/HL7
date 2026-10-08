@@ -573,7 +573,7 @@ H7Message >> msh [
 { #category : 'accessing' }
 H7Message >> pid [
 
-	^ segments at: 1
+	^ self segment:#PID.
 ]
 
 { #category : 'printing' }

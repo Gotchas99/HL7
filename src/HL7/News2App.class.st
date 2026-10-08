@@ -48,14 +48,18 @@ News2App >> renderScored: html [
 		html tableHead: [
 			html tableRow: [
 				html tableHeading: 'Index'.
-				html tableHeading: 'total score'.
+				html tableHeading: 'comp uid'.
 				html tableHeading: 'timestamp'.
-				html tableHeading: 'score' ] ].
+				html tableHeading: 'total score' ] ].
 		html tableBody: [
 			scored doWithIndex: [ :item :index |
 				html tableRow: [
 					html tableData: index.
-					html tableData: (item at:'news2-christer/national_early_warning_score_2_news2/total_score') ] ] ] ]
+					html tableData: (item at: 'news2-christer/_uid').
+					html tableData: (item at: 'news2-christer/context/start_time').
+					html tableData: (item at: 'news2-christer/national_early_warning_score_2_news2/time'). 
+					html tableData: (item at:
+							 'news2-christer/national_early_warning_score_2_news2/total_score') ] ] ] ]
 ]
 
 { #category : 'rendering' }
@@ -73,7 +77,8 @@ News2App >> renderUnscored: html [
 			unscored doWithIndex: [ :item :index |
 				html tableRow: [
 					html tableData: index.
-					html tableData: item second ] ] ] ]
+					html tableData: (item at: 'news2-christer/_uid') .
+					html tableData: (item at: 'news2-christer/composer|name')] ] ] ]
 ]
 
 { #category : 'actions' }

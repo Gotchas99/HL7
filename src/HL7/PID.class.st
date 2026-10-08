@@ -14,3 +14,17 @@ PID class >> fields [
 	     9 'Patient Alias' 11 'Patient Address' 13 'Phone Number – Home'
 	     16 'Marital Status' 23 'Birth Place' 29 'Patient Death Date and Time' 31 'Identity Unknown Indicator')
 ]
+
+{ #category : 'as yet unclassified' }
+PID >> patientId [
+
+	| fld |
+	fld:=(self at: 3)last .
+	^fld first.
+]
+
+{ #category : 'printing' }
+PID >> printOn: aStream [
+
+	aStream << 'PID (Patient ID): ' << self patientId 
+]
