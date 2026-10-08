@@ -49,7 +49,8 @@ News2App >> renderScored: html [
 			html tableRow: [
 				html tableHeading: 'Index'.
 				html tableHeading: 'comp uid'.
-				html tableHeading: 'timestamp'.
+				html tableHeading: 'timestamp measured'.
+								html tableHeading: 'timestamp scored'.
 				html tableHeading: 'total score' ] ].
 		html tableBody: [
 			scored doWithIndex: [ :item :index |
@@ -57,7 +58,9 @@ News2App >> renderScored: html [
 					html tableData: index.
 					html tableData: (item at: 'news2-christer/_uid').
 					html tableData: (item at: 'news2-christer/context/start_time').
-					html tableData: (item at: 'news2-christer/national_early_warning_score_2_news2/time'). 
+					html tableData:
+						(item at:
+							 'news2-christer/national_early_warning_score_2_news2/time').
 					html tableData: (item at:
 							 'news2-christer/national_early_warning_score_2_news2/total_score') ] ] ] ]
 ]
@@ -72,13 +75,14 @@ News2App >> renderUnscored: html [
 		html tableHead: [
 			html tableRow: [
 				html tableHeading: 'Index'.
-				html tableHeading: 'comp_id' ] ].
+				html tableHeading: 'comp_id'.
+				html tableHeading: 'Composer' ] ].
 		html tableBody: [
 			unscored doWithIndex: [ :item :index |
 				html tableRow: [
 					html tableData: index.
-					html tableData: (item at: 'news2-christer/_uid') .
-					html tableData: (item at: 'news2-christer/composer|name')] ] ] ]
+					html tableData: (item at: 'news2-christer/_uid').
+					html tableData: (item at: 'news2-christer/composer|name') ] ] ] ]
 ]
 
 { #category : 'actions' }
