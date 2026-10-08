@@ -138,10 +138,10 @@ WHERE
 { #category : 'score' }
 News2 >> calcRisk: scores [
 
-	(scores at: #total) <= 4 ifTrue: [ ^ 'Låg' ].
-	scores values max = 3 ifTrue: [ ^ 'Låg/medium' ]. 
+	(scores at: #total) <= 4 ifTrue: [ ^ 'Low' ].
+	scores values max = 3 ifTrue: [ ^ 'Low-medium' ].
 	(scores at: #total) <= 6 ifTrue: [ ^ 'Medium' ].
-	^ 'Hög'
+	^ 'High'
 ]
 
 { #category : 'score' }
@@ -391,9 +391,10 @@ News2 >> getEhrId: patient_id [
 { #category : 'api' }
 News2 >> getScored [
 
-	| ids |
+	| ids comps |
 	ids := self findScored.
-	^ids
+	comps := ids collect: [ :twoIds | self retrieveComp: twoIds ].
+	^ comps.
 ]
 
 { #category : 'api' }
@@ -575,19 +576,13 @@ News2 >> scoreValues: vals [
 { #category : 'score engine' }
 News2 >> setFeeder: comp [
 
-	self flag: 'fix path'.
+	| node feeder |
+	node := 'news2-christer/national_early_warning_score_2_news2/'.
+	feeder := node , '_feeder_audit/originating_system_audit/'.
 	comp
-		at:
-			'news2-christer/pulse_oximetry/_feeder_audit/originating_system_audit/system_id'
-		put: 'prototype scoring engine';
-		
-		at:
-			'news2-christer/pulse_oximetry/_feeder_audit/originating_system_audit/time_committed'
-		put: DateAndTime now asString;
-		
-		at:
-			'news2-christer/pulse_oximetry/_feeder_audit/originating_system_audit/version_id'
-		put: 'v:0.1'
+		at: feeder , 'system_id' put: 'prototype scoring engine';
+		at: feeder , 'time_committed' put: DateAndTime now asString;
+		at: feeder , 'version_id' put: 'v:0.1'
 ]
 
 { #category : 'score engine' }

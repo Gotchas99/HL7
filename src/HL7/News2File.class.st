@@ -29,31 +29,31 @@ News2File class >> reset [
 self stop.Default:= nil
 ]
 
-{ #category : 'class initialization' }
+{ #category : 'start-stop' }
 News2File class >> shutDown: quitting [
 	"Our system shutDown hook"
 
 	quitting ifTrue:[self stop].
 ]
 
-{ #category : 'accessing' }
+{ #category : 'start-stop' }
 News2File class >> start [
 <example>
 	Default ifNotNil: [ self stop ].
 	self default start
 ]
 
-{ #category : 'class initialization' }
+{ #category : 'start-stop' }
 News2File class >> startUp: resuming [
 	"Our system startUp hook
 	We do this using deferred startup actions to allow normal error handling."
 
 	resuming ifTrue: [
-		SessionManager default currentSession addDeferredStartupAction: [ "	self managedServers do: [ :each | each start ] "
-		self start	 ] ]
+		SessionManager default currentSession addDeferredStartupAction: [ 
+			self start ] ]
 ]
 
-{ #category : 'accessing' }
+{ #category : 'start-stop' }
 News2File class >> stop [
 <example>
 	Default ifNotNil: [ Default stop ]
