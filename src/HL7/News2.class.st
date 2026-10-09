@@ -288,8 +288,9 @@ News2 >> extractFeeder: aHl7Msg [
 	obx18 := ((h7 segment: #OBX) at: 18) last value.
 	equip := (' - ' split: obx18) first.
 	msh10 := (h7 msh at: 10) last value.
-	originalMsg:= aHl7Msg copyReplaceAll: String cr with: '\r'.
-	originalMsg:= originalMsg copyReplaceAll: '"' with: '\"'.
+	originalMsg := aHl7Msg copyReplaceAll: String cr with: '\r'.
+	originalMsg := originalMsg copyReplaceAll: String lf with: '\n'.
+	originalMsg := originalMsg copyReplaceAll: '"' with: '\"'.
 
 	dict := Dictionary new.
 	dict at: #timestamp put: timestamp asString.

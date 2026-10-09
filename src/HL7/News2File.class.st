@@ -60,13 +60,28 @@ News2File class >> stop [
 ]
 
 { #category : 'accessing' }
-News2File >> processFiles [
+News2File >> processFolders [
 
-	| folder  |
-	folder := 'C:\Pharo\images\HL7 - 12\inFolder' asFileReference.
-	folder files do: [ :file |
-		News2 new processHl7: file contents.
-		file delete ]
+	| folders  |
+	folders := #( 'C:\Pharo\images\HL7 - 12\inFolder' ).
+	folders do: [ :fld |
+		self processOneFolder:fld. ]
+]
+
+{ #category : 'accessing' }
+News2File >> processOneFolder: aPathString [
+
+	|  folder arkivFolder |
+		folder := aPathString asFileReference.
+		arkivFolder := folder / 'arkiv'.
+		arkivFolder ensureCreateDirectory.
+		folder files do: [ :file |
+			News2 new processHl7: file contents.
+			arkivFolder / file basename
+				ifExists: [
+					self traceCr: 'File exists in arkiv: ' , file pathString.
+					file delete ]
+				ifAbsent: [ :arkiv | file moveTo: arkiv ] ] 
 ]
 
 { #category : 'accessing' }
@@ -76,8 +91,8 @@ News2File >> start [
 	service name: 'HL7 watcher service'.
 	"service onSetUpDo: [ Transcript show: 'File watcher started' ].
 	service onTearDownDo: [ Transcript show: 'File watcher finished' ]."
-	service step: [ self processFiles ].
-	service stepDelay: 5 seconds. 
+	service step: [ self processFolders ].
+	service stepDelay: 5 seconds.
 
 	service start
 ]
