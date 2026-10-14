@@ -71,17 +71,17 @@ News2File >> processFolders [
 { #category : 'accessing' }
 News2File >> processOneFolder: aPathString [
 
-	|  folder arkivFolder |
-		folder := aPathString asFileReference.
-		arkivFolder := folder / 'arkiv'.
-		arkivFolder ensureCreateDirectory.
-		folder files do: [ :file |
-			News2 new processHl7: file contents.
-			arkivFolder / file basename
-				ifExists: [
-					self traceCr: 'File exists in arkiv: ' , file pathString.
-					file delete ]
-				ifAbsent: [ :arkiv | file moveTo: arkiv ] ] 
+	| folder arkivFolder |
+	folder := aPathString asFileReference.
+	arkivFolder := folder / 'arkiv'.
+	arkivFolder ensureCreateDirectory.
+	folder files do: [ :file |
+		News2 new processHl7: file contents.
+		arkivFolder / file basename
+			ifExists: [
+				self traceCr: 'File exists in arkiv: ' , file pathString.
+				file delete ]
+			ifAbsent: [ :arkiv | file moveTo: arkivFolder ] ]
 ]
 
 { #category : 'accessing' }
