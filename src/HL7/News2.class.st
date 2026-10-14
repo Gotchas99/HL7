@@ -82,7 +82,6 @@ News2 >> addFeederAuditTransformer [
   "ctx/feeder_audit/feeder_system_audit/system_id": "prototyp-transformer",
   "ctx/feeder_audit/feeder_system_audit/time_committed": "{now}",
 
-  "ctx/feeder_audit/original_content/_type": "DV_PARSED",
   "ctx/feeder_audit/original_content/media_type": "text/plain",
   "ctx/feeder_audit/original_content/value": "{hl7}"
 '
@@ -289,6 +288,7 @@ News2 >> extractFeeder: aHl7Msg [
 	equip := (' - ' split: obx18) first.
 	msh10 := (h7 msh at: 10) last value.
 	originalMsg := aHl7Msg copyReplaceAll: String cr with: '\r'.
+		originalMsg := originalMsg copyReplaceAll: '\r\r' with: '\r'.
 	originalMsg := originalMsg copyReplaceAll: String lf with: '\n'.
 	originalMsg := originalMsg copyReplaceAll: '"' with: '\"'.
 
@@ -420,9 +420,10 @@ News2 >> postValueComposition: inner ehrId: anEhrId [
 				anEhrId. 
 				'composition' };
 		queryAt: 'format' put: 'FLAT';
-		queryAt: 'templateId' put: 'news2-christer'.
+		queryAt: 'templateId' put: 'news2-christer-v0.2.0'.
 	comp := ZnEntity json: inner.
 	cl entity: comp.
+	self halt.
 	cl post.
 	self assert: cl isSuccess.
 	^ cl

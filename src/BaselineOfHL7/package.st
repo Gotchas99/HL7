@@ -1,1 +1,1 @@
-Package { #name : #BaselineOfHL7 }
+Package { #name : 'BaselineOfHL7' }

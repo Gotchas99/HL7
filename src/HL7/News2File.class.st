@@ -62,10 +62,10 @@ News2File class >> stop [
 { #category : 'accessing' }
 News2File >> processFolders [
 
-	| folders  |
-	folders := #( 'C:\Pharo\images\HL7 - 12\inFolder' ).
-	folders do: [ :fld |
-		self processOneFolder:fld. ]
+	| folders |
+	folders := #( 'C:\Pharo\images\HL7 - 12\inFolder' 'P:\MTPHL7').
+	
+	folders do: [ :fld | self processOneFolder: fld ]
 ]
 
 { #category : 'accessing' }
@@ -87,6 +87,7 @@ News2File >> processOneFolder: aPathString [
 { #category : 'accessing' }
 News2File >> start [
 
+	<script: 'self stop;start'>
 	service := TKTParameterizableService new.
 	service name: 'HL7 watcher service'.
 	"service onSetUpDo: [ Transcript show: 'File watcher started' ].
