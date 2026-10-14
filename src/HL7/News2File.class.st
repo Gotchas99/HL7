@@ -71,11 +71,14 @@ News2File >> processFolders [
 { #category : 'accessing' }
 News2File >> processOneFolder: aPathString [
 
-	| folder arkivFolder |
+	| folder arkivFolder fname file |
 	folder := aPathString asFileReference.
 	arkivFolder := folder / 'arkiv'.
 	arkivFolder ensureCreateDirectory.
-	folder files do: [ :file |
+	self halt.
+	[fname := FileSystem disk store firstFileNameIn: aPathString asPath.fname isNotNil] whileTrue:[
+	file := folder /fname.
+	"folder files do: [ :file |"
 		News2 new processHl7: file contents.
 		arkivFolder / file basename
 			ifExists: [
