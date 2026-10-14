@@ -1,6 +1,6 @@
 Class {
 	#name : 'News2App',
-	#superclass : 'WAComponent',
+	#superclass : 'SBSRootComponent',
 	#instVars : [
 		'unscored',
 		'scored'
@@ -10,9 +10,23 @@ Class {
 	#tag : 'NEWS2'
 }
 
+{ #category : 'testing' }
+News2App class >> canBeRoot [
+self deprecated:'Inte nödvändig, om i bootstrap, där det görs'.
+	^ true
+]
+
+{ #category : 'class initialization' }
+News2App class >> contextRoot [
+
+	^ 'news2'
+]
+
 { #category : 'class initialization' }
 News2App class >> initialize [
-	WAAdmin register: self asApplicationAt: 'news2'
+
+"	WAAdmin register: self asApplicationAt: self contextRoot"
+	self register
 ]
 
 { #category : 'initialization' }
@@ -27,7 +41,7 @@ self updateUnscored ;updateScored .
 News2App >> renderContentOn: html [
 	"html tableData: item third.
 					html tableData: item fifth"
-
+ html container: [
 	html heading: 'Hello from Seaside!'.
 	self renderUnscored: html.
 	html div.
@@ -35,7 +49,7 @@ News2App >> renderContentOn: html [
 		callback: [ self scoreAll ];
 		with: 'Run scoring engine'.
 	html div.
-	self renderScored: html
+	self renderScored: html]
 ]
 
 { #category : 'rendering' }
@@ -89,6 +103,14 @@ News2App >> renderUnscored: html [
 News2App >> scoreAll [
 
 	News2 new scoreAllPending .
+]
+
+{ #category : 'updating' }
+News2App >> updateRoot: anHtmlRoot [
+
+	super updateRoot: anHtmlRoot.
+	anHtmlRoot title: 'My App'
+	.anHtmlRoot meta name: 'viewport'; content: 'width=device-width, initial-scale=1'
 ]
 
 { #category : 'actions' }
