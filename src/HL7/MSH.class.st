@@ -27,6 +27,14 @@ MSH >> isPCD [
 ]
 
 { #category : 'testing' }
+MSH >> msgTimestamp [
+
+	| fld |
+	fld := (self at: 7) third.
+	^ fld
+]
+
+{ #category : 'testing' }
 MSH >> msgType [
 
 	^ (self at: 9) last at: 3

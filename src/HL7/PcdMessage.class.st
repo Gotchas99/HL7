@@ -104,6 +104,16 @@ PcdMessage >> from: aH7Msg [
 ]
 
 { #category : 'accessing' }
+PcdMessage >> getFirstIdNo: anIdNoList [
+
+	| vals |
+	vals := anIdNoList collect: [ :id | (mds getIdNo: id)  ] thenReject: #isNil.
+	"self assert: vals isNotEmpty ."
+	vals isEmpty ifTrue:[self traceCr: 'PCD IDs not found: ',anIdNoList asString. ^nil].
+	^ vals first.
+]
+
+{ #category : 'accessing' }
 PcdMessage >> getIdNo: anIdNo [
 
 	^ mds getIdNo: anIdNo

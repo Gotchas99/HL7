@@ -304,25 +304,27 @@ News2 >> extractFeeder: aHl7Msg [
 ]
 
 { #category : 'incoming' }
-News2 >> extractFromHl7: aHl7 [
+News2 >> extractFromHl7: h7 [
 
-	| h7 pcd dict patient_id timestamp obr7 |
-	h7 := (H7Parser on: aHl7) parse.
+	|  pcd dict patient_id timestamp obr7 |
+	"h7 := (H7Parser on: aHl7) parse."
 	pcd := PcdMessage from: h7.
 	obr7 := ((h7 segment: #OBR) at: 7) last value.
 	timestamp := DateAndTime readYMDHMSfromDigits: obr7 readStream.
 
 	dict := Dictionary new.
 	dict at: #timestamp put: timestamp asString.
-	dict at: #respiration put: (pcd getIdNo: 151562) value.
+	dict at: #respiration put: (pcd getFirstIdNo: #( 151562 )) value.
 	dict at: #spo put: (pcd getIdNo: 150456) value.
-	dict at: #systolic put: (pcd getIdNo: 150037) value.
+	dict at: #systolic put: (pcd getFirstIdNo: #( 150037 150033 )) value.
 	dict at: #pulse put: (pcd getIdNo: 149514) value.
-	dict at: #temperature put: (pcd getIdNo: 188420) value.
-	patient_id := ((h7 pid) patientId ) .
+	dict
+		at: #temperature
+		put: (pcd getFirstIdNo: #( 188420 150348 )) value.
+	patient_id := h7 pid patientId.
 	"namn: ((pcd hl7 segment: #pid) at:5) third."
 	dict at: #ehrid put: (self getEhrId: patient_id).
-
+	"self assert: (dict values noneSatisfy: #isNil)."
 	^ dict
 ]
 
@@ -424,7 +426,6 @@ News2 >> postValueComposition: inner ehrId: anEhrId [
 		queryAt: 'templateId' put: 'news2-christer-v0.2.0'.
 	comp := ZnEntity json: inner.
 	cl entity: comp.
-	self halt.
 	cl post.
 	self assert: cl isSuccess.
 	^ cl
@@ -433,8 +434,11 @@ News2 >> postValueComposition: inner ehrId: anEhrId [
 { #category : 'incoming' }
 News2 >> processHl7: aHl7Msg [
 
-	| inner dict feeder feederDict |
-	dict := self extractFromHl7: aHl7Msg.
+	| inner dict feeder feederDict h7 |
+	h7 := (H7Parser on: aHl7Msg) parse.
+	dict := self extractFromHl7: h7.
+	(dict values anySatisfy: #isNil) ifTrue: [
+		Error signal: 'some values are nil' ].
 	feederDict := self extractFeeder: aHl7Msg.
 
 	inner := self createValueCompFrom: dict.
@@ -442,7 +446,7 @@ News2 >> processHl7: aHl7Msg [
 	self
 		postValueComposition: '{' , inner , ',' , feeder , '}'
 		ehrId: (dict at: #ehrid).
-	self traceCr:'Stored one comp from HL7'
+	self traceCr: 'Stored one comp from HL7: ', h7 pid patientId .
 ]
 
 { #category : 'score engine' }

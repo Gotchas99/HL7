@@ -60,6 +60,36 @@ News2File class >> stop [
 ]
 
 { #category : 'accessing' }
+News2File >> archiveFile: file toFolder: arkivFolder [
+
+	| hl7text h7 timestamp date timestampStr dayFolder |
+	hl7text := file contents.
+	h7 := (H7Parser on: hl7text) parse.
+	timestampStr := h7 msh msgTimestamp value.
+	timestamp:=DateAndTime readYMDHMSfromDigits: timestampStr readStream.
+	date := timestamp asDate.
+	dayFolder:= (arkivFolder / date yyyymmdd)ensureCreateDirectory .
+	dayFolder / file basename
+		ifExists: [
+			self traceCr: 'File exists in arkiv: ' , file pathString.
+			file delete ]
+		ifAbsent: [ :arkiv | file moveTo: dayFolder ]
+]
+
+{ #category : 'accessing' }
+News2File >> moveToInvalid: file folder: folder [
+
+	| invalidFolder |
+	invalidFolder := folder / 'invalid'.
+	invalidFolder ensureCreateDirectory .
+	invalidFolder / file basename
+		ifExists: [
+			self traceCr: 'File exists in invalid, deleting: ' , file basename.
+			file delete ]
+		ifAbsent: [ :newfilename | file moveTo: invalidFolder ]
+]
+
+{ #category : 'accessing' }
 News2File >> processFolders [
 
 	| folders |
@@ -75,16 +105,15 @@ News2File >> processOneFolder: aPathString [
 	folder := aPathString asFileReference.
 	arkivFolder := folder / 'arkiv'.
 	arkivFolder ensureCreateDirectory.
-	self halt.
-	[fname := FileSystem disk store firstFileNameIn: aPathString asPath.fname isNotNil] whileTrue:[
-	file := folder /fname.
-	"folder files do: [ :file |"
+	[
+	fname := FileSystem disk store firstFileNameIn: aPathString asPath.
+	fname isNotNil ] whileTrue: [
+		file := folder / fname.
+		[ 
 		News2 new processHl7: file contents.
-		arkivFolder / file basename
-			ifExists: [
-				self traceCr: 'File exists in arkiv: ' , file pathString.
-				file delete ]
-			ifAbsent: [ :arkiv | file moveTo: arkivFolder ] ]
+		self archiveFile: file toFolder: arkivFolder ]
+			on: Error
+			do: [ self moveToInvalid: file folder: folder ] ]
 ]
 
 { #category : 'accessing' }
