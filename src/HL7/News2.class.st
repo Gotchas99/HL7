@@ -5,12 +5,27 @@ Class {
 		'mds',
 		'hl7'
 	],
+	#classVars : [
+		'MPI'
+	],
 	#category : 'HL7-NEWS2',
 	#package : 'HL7',
 	#tag : 'NEWS2'
 }
 
-{ #category : 'as yet unclassified' }
+{ #category : 'accessing' }
+News2 class >> ehrIdFromPid:aPatientId [ 
+"Patientid = personnr"
+^MPI at: aPatientId 
+]
+
+{ #category : 'class initialization' }
+News2 class >> initialize [
+
+	self setupMPI.
+]
+
+{ #category : 'sample' }
 News2 class >> sample_composition [
 ^'{
     "news2-christer/category|terminology": "openehr",
@@ -66,6 +81,16 @@ News2 class >> sample_composition [
     "news2-christer/composer|name": "Alve Don",
     "news2-christer/_uid": "bf1f29c3-b652-460a-bb53-c0470202c5b8::local.ehrbase.org::1"
 }'.
+]
+
+{ #category : 'class initialization' }
+News2 class >> setupMPI [
+
+	MPI := Dictionary new.
+	MPI at: '191212-1212' put: '118c83af-7b05-4539-987b-bb0b30198bf4'.
+	MPI at: '201702022383' put: '68cddce0-ba4c-47fb-8693-5550b8073d35'.
+	MPI at: '200009262395' put: '7e533660-83dd-4965-b1cf-e857aeec9fea'.
+	MPI at: '199504182396' put: 'asdf'
 ]
 
 { #category : 'incoming' }
@@ -240,7 +265,57 @@ News2 >> createValueCompFrom: dict [
 	^  result 
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'private' }
+News2 >> deleteAllComps: aPatientId [
+	"bara med template: news2-christer"
+
+	| allComps aql pat_ehr cl ehrId compId |
+	self halt.
+	pat_ehr := self class ehrIdFromPid: aPatientId.
+	aql := '\{
+  "q": "SELECT e/ehr_id/value as ehr_id, c/uid/value as composition_id, c/name/value as template_name, c/context/start_time/value as start_time FROM EHR e[ehr_id/value=$ehr_id] CONTAINS COMPOSITION c WHERE c/archetype_details/template_id/value=''news2-christer''",
+  "query_parameters": \{ "ehr_id": "{1}"\}\}'.
+	cl := self ehrClient forJsonREST.
+	cl
+		addPath: { 'query'. 'aql' };
+		entity: (ZnEntity json: (aql format: { pat_ehr }));
+		post.
+	self assert: cl isSuccess.
+	allComps := cl contents at: #rows.
+	allComps do: [ :row |
+		ehrId := row first.
+		compId := row second.
+		cl := self ehrClient.
+		cl
+			addPath: 'ehr';
+			addPath: ehrId;
+			addPath: 'composition';
+			addPath: compId.
+		cl delete.
+		self assert: cl isSuccess ]
+]
+
+{ #category : 'private' }
+News2 >> deleteAllPendingEhr [
+
+	| allScoredIds |
+	self halt.
+	allScoredIds := self findPending .
+	allScoredIds do: [ :twoIds |
+		| cl ehrId compId |
+		ehrId := twoIds first.
+		compId := twoIds second.
+		cl := self ehrClient.
+		cl
+			addPath: 'ehr';
+			addPath: ehrId;
+			addPath: 'composition';
+			addPath: compId.
+		cl delete.
+		self assert: cl isSuccess ]
+]
+
+{ #category : 'private' }
 News2 >> deleteAllScoredEhr [
 
 	| allScoredIds |
@@ -388,9 +463,10 @@ News2 >> findScored [
 
 { #category : 'private' }
 News2 >> getEhrId: patient_id [
-	"tolvan i ehrBase sandbox: '0d3d3cdf-3a64-40f4-8f3b-5fcd51ec6c7d'"
-"tolvan i vgr ehrbase"
-	^ '118c83af-7b05-4539-987b-bb0b30198bf4' 
+	"tolvan i ehrBase sandbox: '0d3d3cdf-3a64-40f4-8f3b-5fcd51ec6c7d'
+	tolvan i vgr ehrbase: 118c83af-7b05-4539-987b-bb0b30198bf4"
+
+	^ self class ehrIdFromPid: patient_id
 ]
 
 { #category : 'api' }
@@ -446,7 +522,7 @@ News2 >> processHl7: aHl7Msg [
 	self
 		postValueComposition: '{' , inner , ',' , feeder , '}'
 		ehrId: (dict at: #ehrid).
-	self traceCr: 'Stored one comp from HL7: ', h7 pid patientId .
+	self traceCr: DateAndTime now asString,' Stored one comp from HL7: ' , h7 pid patientId
 ]
 
 { #category : 'score engine' }
