@@ -29,6 +29,15 @@ News2App class >> initialize [
 	self register
 ]
 
+{ #category : 'registration' }
+News2App class >> register [
+
+	| app |
+	super register.
+	app := WAAdmin register: self asApplicationAt: self contextRoot.
+	^ app
+]
+
 { #category : 'initialization' }
 News2App >> initialize [
 

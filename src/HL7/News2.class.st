@@ -1,10 +1,6 @@
 Class {
 	#name : 'News2',
 	#superclass : 'Object',
-	#instVars : [
-		'mds',
-		'hl7'
-	],
 	#classVars : [
 		'MPI'
 	],
@@ -96,6 +92,31 @@ News2 class >> setupMPI [
 { #category : 'incoming' }
 News2 >> addFeederAuditTransformer [
 
+	| tmp |
+	tmp := '"news2-christer/_feeder_audit/originating_system_item_ids:0|id": "{msh10}",
+  "news2-christer/_feeder_audit/originating_system_item_ids:0|type": "HL7_MSH_10",
+  "news2-christer/_feeder_audit/originating_system_item_ids:0|issuer": "CHA_NAL",
+'.
+
+	^ '
+  "news2-christer/_feeder_audit/originating_system_audit|system_id": "{originating}",
+  "news2-christer/_feeder_audit/originating_system_audit|time": "{timestamp}",
+  
+  "news2-christer/_feeder_audit/originating_system_item_id:0|id": "{msh10}",
+  "news2-christer/_feeder_audit/originating_system_item_id:0|type": "HL7_MSH_10",
+  "news2-christer/_feeder_audit/originating_system_item_id:0|issuer": "CHA_NAL",
+
+  "news2-christer/_feeder_audit/original_content|formalism": "text/hl7v2",
+  "news2-christer/_feeder_audit/original_content": "{hl7}",
+
+  "news2-christer/_feeder_audit/feeder_system_audit|system_id": "prototyp-transformer",
+  "news2-christer/_feeder_audit/feeder_system_audit|time": "{now}"  
+'
+]
+
+{ #category : 'incoming' }
+News2 >> addFeederAuditTransformer_ctx [
+
 	^ '
   "ctx/feeder_audit/originating_system_audit/system_id": "{originating}",
   "ctx/feeder_audit/originating_system_audit/time_committed": "{timestamp}",
@@ -110,6 +131,29 @@ News2 >> addFeederAuditTransformer [
   "ctx/feeder_audit/original_content/media_type": "text/plain",
   "ctx/feeder_audit/original_content/value": "{hl7}"
 '
+]
+
+{ #category : 'incoming' }
+News2 >> aqlMsh10: aMsh10 [
+
+	|  aql res param |
+	aql := 'SELECT e/ehr_id/value AS ehr_id, 
+  c/uid/value AS composition_id, 
+  c/archetype_details/template_id/value AS template_id, 
+  c/context/start_time/value AS start_time 
+  FROM EHR e 
+  CONTAINS COMPOSITION c 
+  WHERE c/feeder_audit/originating_system_item_ids/id = $msh10'
+		       "copyReplaceAll: String cr
+		       with: '\r'". 
+	param := Dictionary new
+		         at: #msh10 put: aMsh10;
+		         yourself.
+	res := Dictionary new.
+	res
+		at: 'q' put: aql;
+		at: 'query_parameters' put: param.
+	^ res
 ]
 
 { #category : 'score engine' }
@@ -488,6 +532,22 @@ News2 >> getUnscored [
 ]
 
 { #category : 'incoming' }
+News2 >> isDuplicate: aMsh10 [
+
+	| aql body cl rows ids |
+	aql := self aqlMsh10:aMsh10.
+	"body := ZnEntity json: aql."
+	cl := self ehrClient forJsonREST.
+	cl addPath: { 'query'. 'aql' }.
+	"cl entity: body."
+	cl contents: aql.
+	cl post.
+	self assert: cl isSuccess.
+	rows := cl contents at: #rows.
+^rows isNotEmpty .
+]
+
+{ #category : 'incoming' }
 News2 >> postValueComposition: inner ehrId: anEhrId [
 
 	| comp cl |
@@ -496,7 +556,7 @@ News2 >> postValueComposition: inner ehrId: anEhrId [
 	cl
 		addPath: {
 				'ehr'.
-				anEhrId. 
+				anEhrId.
 				'composition' };
 		queryAt: 'format' put: 'FLAT';
 		queryAt: 'templateId' put: 'news2-christer-v0.2.0'.
@@ -510,8 +570,10 @@ News2 >> postValueComposition: inner ehrId: anEhrId [
 { #category : 'incoming' }
 News2 >> processHl7: aHl7Msg [
 
-	| inner dict feeder feederDict h7 |
+	| inner dict feeder feederDict h7 msh10 |
 	h7 := (H7Parser on: aHl7Msg) parse.
+	msh10 := (h7 msh at: 10) last value.
+	(self isDuplicate: msh10)ifTrue:[self halt.]ifFalse:[.
 	dict := self extractFromHl7: h7.
 	(dict values anySatisfy: #isNil) ifTrue: [
 		Error signal: 'some values are nil' ].
@@ -521,8 +583,10 @@ News2 >> processHl7: aHl7Msg [
 	feeder := self addFeederAuditTransformer format: feederDict.
 	self
 		postValueComposition: '{' , inner , ',' , feeder , '}'
-		ehrId: (dict at: #ehrid).
-	self traceCr: DateAndTime now asString,' Stored one comp from HL7: ' , h7 pid patientId
+		ehrId: (dict at: #ehrid)].
+	self traceCr:
+		DateAndTime now asString , ' Stored one comp from HL7: '
+		, h7 pid patientId
 ]
 
 { #category : 'score engine' }
