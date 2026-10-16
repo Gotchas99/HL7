@@ -273,7 +273,7 @@ News2 >> deleteAllComps: aPatientId [
 	self halt.
 	pat_ehr := self class ehrIdFromPid: aPatientId.
 	aql := '\{
-  "q": "SELECT e/ehr_id/value as ehr_id, c/uid/value as composition_id, c/name/value as template_name, c/context/start_time/value as start_time FROM EHR e[ehr_id/value=$ehr_id] CONTAINS COMPOSITION c WHERE c/archetype_details/template_id/value=''news2-christer''",
+  "q": "SELECT e/ehr_id/value as ehr_id, c/uid/value as composition_id, c/name/value as template_name, c/context/start_time/value as start_time FROM EHR e[ehr_id/value=$ehr_id] CONTAINS COMPOSITION c WHERE c/archetype_details/template_id/value MATCHES \{''news2-christer'', ''news2-christer-v0.2.0''\}",
   "query_parameters": \{ "ehr_id": "{1}"\}\}'.
 	cl := self ehrClient forJsonREST.
 	cl
