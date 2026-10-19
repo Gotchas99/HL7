@@ -209,6 +209,7 @@ News2 >> calcRisk: scores [
 	(scores at: #total) <= 4 ifTrue: [ ^ 'Low' ].
 	scores values max = 3 ifTrue: [ ^ 'Low-medium' ].
 	(scores at: #total) <= 6 ifTrue: [ ^ 'Medium' ].
+	
 	^ 'High'
 ]
 

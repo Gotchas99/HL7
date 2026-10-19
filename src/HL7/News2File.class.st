@@ -102,14 +102,15 @@ News2File >> processFolders [
 News2File >> processOneFolder: aPathString [
 
 	| folder arkivFolder fname file |
-	folder := aPathString asFileReference.
+	folder := aPathString asFileReference. 
+	folder exists ifFalse: [ ^ self ].
 	arkivFolder := folder / 'arkiv'.
 	arkivFolder ensureCreateDirectory.
 	[
 	fname := FileSystem disk store firstFileNameIn: aPathString asPath.
 	fname isNotNil ] whileTrue: [
 		file := folder / fname.
-		[ 
+		[
 		News2 new processHl7: file contents.
 		self archiveFile: file toFolder: arkivFolder ]
 			on: Error
