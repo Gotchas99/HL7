@@ -1,6 +1,9 @@
 Class {
 	#name : 'MtpApp',
 	#superclass : 'WAComponent',
+	#instVars : [
+		'patients'
+	],
 	#category : 'HL7-NEWS2',
 	#package : 'HL7',
 	#tag : 'NEWS2'
@@ -32,11 +35,103 @@ MtpApp class >> register [
 	^ app
 ]
 
+{ #category : 'initialization' }
+MtpApp >> createPatients [
+
+	patients :=OrderedCollection new.
+]
+
+{ #category : 'initialization' }
+MtpApp >> initialize [
+
+	super initialize.
+	 self createPatients
+]
+
 { #category : 'rendering' }
 MtpApp >> renderContentOn: html [
-	
-		html heading: 'Hello from MTP-app!'.
-	
+
+	html div
+		class: 'omslag';
+		with: [
+			self renderHuvudOn: html.
+			self renderNyckelTalOn: html.
+			html div class: 'patienter'.
+			patients do: [ :pat | self renderPatientOn: html ].
+			self renderFooter: html ]
+]
+
+{ #category : 'rendering' }
+MtpApp >> renderFooter: html [
+
+	html paragraph
+		class: 'notis';
+		with:
+			'Medvetandegrad och tillförd syrgas mäts inte av monitorn. De är antagna där inget annat anges, och en bedömning som bygger på antaganden kallas aldrig bara &#8221;NEWS2&#8221; utan redovisas som partiell.'.
+	^ html paragraph
+		  class: 'fot-not';
+		  with:
+			  'Klicka på en rad för att se härledningen per komponent. Trendkurvan visar NEWS2 de senaste fyra timmarna, en punkt per halvtimme. Larm hanteras av övervakningssystemet — tavlan larmar inte.'
+]
+
+{ #category : 'rendering' }
+MtpApp >> renderHuvudOn: html [
+
+	html div
+		class: 'huvud';
+		with: [html div:
+		[	html heading: 'IVA 3 — Early Warning Score'.
+			html paragraph:
+					'Mätvärden från patientövervakningen. Poängen är beräknad på lagrade värden, inte på monitorns display.'].
+			html div
+				class: 'stampel';
+				with: [
+					html
+						tag:'b' with: 'Uppdaterad 14:32';
+						text: 'Syntetiska demopatienter' ] ]
+]
+
+{ #category : 'rendering' }
+MtpApp >> renderNyckelTalOn: html [
+
+	html div
+		class: 'nyckeltal';
+		with: [
+			self
+				renderOneNyckelTal:
+					{ 'Patienter på tavlan'. 3. 'Sängar med pågående övervakning' }
+				on: html.
+			self renderOneNyckelTal: { 'Kräver åtgärd nu'. 3. 'NEWS2 ≥ 5 eller enskild parameter 3 p' } on: html.
+			self renderOneNyckelTal: { 'Partiell bedömning'. 
+				1. 'Komponenter saknas eller är för gamla' } on: html.
+			self
+				renderOneNyckelTal: { 'Avvisade senaste timmen'.
+					3. 'Syns i granskningsvyn, kastas inte tyst' }
+				on: html ]
+]
+
+{ #category : 'rendering' }
+MtpApp >> renderOneNyckelTal: aList on: html [
+
+	html div
+		class: 'nyckeltal';
+		with: [
+			html div
+				class: 'ruta';
+				with: [
+					html div
+						class: 'etikett';
+						with: aList first.
+					html div
+						class: 'tal';
+						with: aList second .html div
+				class: 'fot';
+				with: aList third].
+			 ]
+]
+
+{ #category : 'rendering' }
+MtpApp >> renderPatientOn: html [
 ]
 
 { #category : 'hooks' }
@@ -231,4 +326,15 @@ table.data code { font: 12px/1.4 var(--mono); color: var(--ink-2); white-space: 
   table.data { display: block; overflow-x: auto; white-space: nowrap; }
 }
 '
+]
+
+{ #category : 'updating' }
+MtpApp >> updateRoot: anHtmlRoot [
+
+	super updateRoot: anHtmlRoot.
+	anHtmlRoot beHtml5.
+	anHtmlRoot title: 'Avdelningstavla · NEWS2'.
+	anHtmlRoot meta
+		name: 'viewport';
+		content: 'width=device-width, initial-scale=1'
 ]
