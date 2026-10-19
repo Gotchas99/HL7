@@ -38,7 +38,12 @@ MtpApp class >> register [
 { #category : 'initialization' }
 MtpApp >> createPatients [
 
-	patients :=OrderedCollection new.
+	| p |
+	patients := OrderedCollection new.
+	p:= Dictionary new.
+	patients add: p.	p:= Dictionary new.
+	patients add: p.	p:= Dictionary new.
+	patients add: p.
 ]
 
 { #category : 'initialization' }
@@ -67,7 +72,7 @@ MtpApp >> renderFooter: html [
 	html paragraph
 		class: 'notis';
 		with:
-			'Medvetandegrad och tillförd syrgas mäts inte av monitorn. De är antagna där inget annat anges, och en bedömning som bygger på antaganden kallas aldrig bara &#8221;NEWS2&#8221; utan redovisas som partiell.'.
+			'Medvetandegrad och tillförd syrgas mäts inte av monitorn. De är antagna där inget annat anges, och en bedömning som bygger på antaganden kallas aldrig bara ''NEWS2'' utan redovisas som partiell.'.
 	^ html paragraph
 		  class: 'fot-not';
 		  with:
@@ -132,6 +137,15 @@ MtpApp >> renderOneNyckelTal: aList on: html [
 
 { #category : 'rendering' }
 MtpApp >> renderPatientOn: html [
+
+	html details
+		class: 'patient';
+		with: [
+			html summary: [
+					html div
+						class: 'sang';
+						with: [ html tag: 'b' with: 'ads' ].
+					html text: 'patient X' ]. html div class:'harledning';with:[html heading level3;with:'Härledning — alla sju komponenter'] ]
 ]
 
 { #category : 'hooks' }
