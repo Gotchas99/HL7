@@ -100,14 +100,14 @@ MtpPatient >> renderPatientOn: html [
 						with: [
 							html
 								text: 'IVA-03';
-								tag: 'b' with: (pat at:'namn');
-								text: (pat at:'personnr') ].
+								tag: 'b' with: (pat at: 'namn');
+								text: (pat at: 'personnr') ].
 					html div
 						class: 'poang';
 						with: [
 							html div
 								class: 'varde';
-								with: '11'.
+								with:  (pat at: 'total_score').
 							html div
 								class: 'av';
 								with: 'NEWS2' ].
@@ -125,7 +125,7 @@ MtpPatient >> renderPatientOn: html [
 								class: 'status-kritisk';
 								with: [
 									html span class: 'prick'.
-									html text: 'Hög' ].
+									html text: (pat at: 'risk_category') ].
 							html div
 								class: 'sent';
 								with: 'äldsta delvärde 12 min' ].

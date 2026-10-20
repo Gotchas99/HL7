@@ -62,12 +62,21 @@ MtpApp >> createPatients [
 ]
 
 { #category : 'initialization' }
+MtpApp >> getValuesFromCdr [
+
+	| res |
+	patients do: [ :pat |
+		res := News2 new getAvdTavla: { (pat at: 'personnr') }. 
+		pat addAll: res values first ]
+]
+
+{ #category : 'initialization' }
 MtpApp >> initialize [
 
-	
 	super initialize.
 	self createPatients.
-	patientComps := patients collect: [ :p | MtpPatient new patient:p ]
+	self getValuesFromCdr .
+	patientComps := patients collect: [ :p | MtpPatient new patient: p ]
 ]
 
 { #category : 'rendering' }
