@@ -100,8 +100,8 @@ MtpPatient >> renderPatientOn: html [
 						with: [
 							html
 								text: 'IVA-03';
-								tag: 'b' with: 'Testsson, Carin';
-								text: '19720305-3182' ].
+								tag: 'b' with: (pat at:'namn');
+								text: (pat at:'personnr') ].
 					html div
 						class: 'poang';
 						with: [
@@ -123,7 +123,12 @@ MtpPatient >> renderPatientOn: html [
 							html span
 								class: 'status';
 								class: 'status-kritisk';
-								with: [html span class:'prick'.html text:'Hög'].html div class:'sent';with:'äldsta delvärde 12 min' ].
+								with: [
+									html span class: 'prick'.
+									html text: 'Hög' ].
+							html div
+								class: 'sent';
+								with: 'äldsta delvärde 12 min' ].
 					html div
 						class: 'pil';
 						with: [ html html: '&#9654;' ] ].

@@ -46,11 +46,19 @@ MtpApp >> createPatients [
 	| p |
 	patients := OrderedCollection new.
 	p := Dictionary new.
+	p at: 'personnr' put: '201702022383'.
+	p at: 'namn' put: 'Stinasson-af Klintberg'.
 	patients add: p.
+
 	p := Dictionary new.
-	patients add: p.
-	p := Dictionary new.
+	p at: 'personnr' put: '200009262395'.
+	p at: 'namn' put: 'Maria Test Johansson'.
 	patients add: p
+
+	"p := Dictionary new.
+	199504182396
+	Risato^Clark Johan
+	patients add: p"
 ]
 
 { #category : 'initialization' }
@@ -94,15 +102,16 @@ MtpApp >> renderHuvudOn: html [
 
 	html div
 		class: 'huvud';
-		with: [html div:
-		[	html heading: 'IVA 3 — Early Warning Score'.
-			html paragraph:
-					'Mätvärden från patientövervakningen. Poängen är beräknad på lagrade värden, inte på monitorns display.'].
+		with: [
+			html div: [
+					html heading: 'IVA 3 — Early Warning Score'.
+					html paragraph:
+							'Mätvärden från patientövervakningen. Poängen är beräknad på lagrade värden, inte på monitorns display.' ].
 			html div
 				class: 'stampel';
 				with: [
 					html
-						tag:'b' with: 'Uppdaterad 14:32';
+						tag: 'b' with: 'Uppdaterad ',DateAndTime now asStringYMDHM;
 						text: 'Syntetiska demopatienter' ] ]
 ]
 

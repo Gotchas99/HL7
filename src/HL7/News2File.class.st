@@ -111,8 +111,8 @@ News2File >> processFolders [
 News2File >> processOneFolder: aPathString [
 
 	| folder arkivFolder fname file |
-	folder := aPathString asFileReference. 
-	folder exists ifFalse: [ ^ self ].
+	folder := aPathString asFileReference.
+	folder exists ifFalse: [Error signal:'Folder är inte tillgänglig. Är P: uppkopplad?'. ^ self ].
 	arkivFolder := folder / 'arkiv'.
 	arkivFolder ensureCreateDirectory.
 	[

@@ -3,7 +3,7 @@ Extension { #name : 'DiskStore' }
 { #category : '*HL7' }
 DiskStore >> firstFileNameIn: aPath [
 
-	| pathString openDir dirPointer entryData fileName |
+	| pathString openDir dirPointer entryData entryName |
 	pathString := File encodePathString: (self stringFromPath: aPath).
 	(self isDirectory: aPath) ifFalse: [
 		^ self signalDirectoryDoesNotExist: aPath ].
@@ -14,8 +14,8 @@ DiskStore >> firstFileNameIn: aPath [
 	entryData := openDir.
 	[
 	[ entryData isNotNil ] whileTrue: [
-		fileName := entryData first.
-		entryData at: 1 put: (File decodePathString: fileName).
+		entryName := entryData first.
+		entryData at: 1 put: (File decodePathString: entryName).
 		(File isFile: (aPath / entryData first) pathString allButFirst)
 			ifTrue: [ ^ entryData first ].
 		entryData := File primReaddir: dirPointer ] ] ensure: [

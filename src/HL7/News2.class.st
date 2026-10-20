@@ -133,19 +133,52 @@ News2 >> addFeederAuditTransformer_ctx [
 '
 ]
 
+{ #category : 'api' }
+News2 >> aqlAvdTavla [
+
+	^ 'SELECT e/ehr_id/value as ehr_id, 
+  c/uid/value as composition_id, 
+  c/name/value as template_name, 
+  c/context/start_time/value as start_time,
+  o/data[at0001]/events[at0002]/data[at0003]/items[at0028]/value/magnitude AS total_score,
+  o/data[at0001]/events[at0002]/data[at0003]/items[at0056]/value/value AS risk_category
+
+  FROM EHR e[ehr_id/value=$ehr_id] 
+    CONTAINS COMPOSITION c 
+      CONTAINS OBSERVATION o[openEHR-EHR-OBSERVATION.news2.v1]
+  WHERE c/name/value = ''news2-christer''
+  ORDER BY c/context/start_time/value DESC
+  LIMIT 1'
+]
+
+{ #category : 'private' }
+News2 >> aqlBody: anAqlText params: aDict [
+
+	| res  |
+	res := Dictionary new
+		       at: 'q' put: anAqlText;
+		       at: 'query_parameters' put: aDict;yourself.
+	^ res
+]
+
+{ #category : 'api' }
+News2 >> aqlGetAvdTavla [
+
+	| res |
+	res:= 6 collect:[:pnr|]. ^res
+]
+
 { #category : 'incoming' }
 News2 >> aqlMsh10: aMsh10 [
 
-	|  aql res param |
+	| aql res param |
 	aql := 'SELECT e/ehr_id/value AS ehr_id, 
   c/uid/value AS composition_id, 
   c/archetype_details/template_id/value AS template_id, 
   c/context/start_time/value AS start_time 
   FROM EHR e 
   CONTAINS COMPOSITION c 
-  WHERE c/feeder_audit/originating_system_item_ids/id = $msh10'
-		       "copyReplaceAll: String cr
-		       with: '\r'". 
+  WHERE c/feeder_audit/originating_system_item_ids/id = $msh10'.
 	param := Dictionary new
 		         at: #msh10 put: aMsh10;
 		         yourself.
@@ -168,11 +201,31 @@ FROM
     EHR e
     CONTAINS COMPOSITION c
 WHERE
-    c/archetype_details/template_id/value = ''news2-christer''
+    c/archetype_details/template_id/value = ''news2-christer-v0.2.1''
     AND NOT c/context/other_context[at0001]/items[openEHR-EHR-CLUSTER.processing_status.v0]/items[at0001]/value/defining_code/code_string = ''at0003'' '.
 	query2 := query copyReplaceAll: String cr with: '\r'.
 	aql := '{ "q": "' , query2 , '"}'.
 	^ aql
+]
+
+{ #category : 'private' }
+News2 >> aqlQuery: aqlText [
+
+	^self aqlQuery: aqlText params: Dictionary new.
+]
+
+{ #category : 'private' }
+News2 >> aqlQuery: aqlText params: aDict [
+
+	| aql cl  res |
+	aql := self aqlBody: aqlText params: aDict.
+	cl := self ehrClient forJsonREST.
+	cl addPath: { 'query'. 'aql' }.
+	cl contents: aql.
+	cl post.
+	self assert: cl isSuccess.
+	res := cl contents.
+	^ res
 ]
 
 { #category : 'api' }
@@ -506,6 +559,27 @@ News2 >> findScored [
 	^ ids
 ]
 
+{ #category : 'api' }
+News2 >> getAvdTavla: aListOfPersonNr [
+
+	| res param ehr_id columnNames rows dict |
+	res := aListOfPersonNr collect: [ :pnr |
+		       ehr_id := self getEhrId: pnr.
+		       param := Dictionary new
+			                at: 'ehr_id' put: ehr_id;
+			                yourself.
+		       res := self aqlQuery: self aqlAvdTavla params: param.
+		       columnNames := (res at: 'columns') collect: [ :c |
+			                      c at: 'name' ].
+		       rows := (res at: 'rows') collect: [ :r | 
+			               dict := Dictionary new.
+			               1 to: r size do: [ :idx |
+			               dict at: (columnNames at: idx) put: (r at: idx) ].
+			               dict ] .
+		pnr -> rows first].
+	^ res asDictionary.
+]
+
 { #category : 'private' }
 News2 >> getEhrId: patient_id [
 	"tolvan i ehrBase sandbox: '0d3d3cdf-3a64-40f4-8f3b-5fcd51ec6c7d'
@@ -535,17 +609,15 @@ News2 >> getUnscored [
 { #category : 'incoming' }
 News2 >> isDuplicate: aMsh10 [
 
-	| aql body cl rows ids |
-	aql := self aqlMsh10:aMsh10.
-	"body := ZnEntity json: aql."
+	| aql  cl rows  |
+	aql := self aqlMsh10: aMsh10.
 	cl := self ehrClient forJsonREST.
 	cl addPath: { 'query'. 'aql' }.
-	"cl entity: body."
 	cl contents: aql.
 	cl post.
 	self assert: cl isSuccess.
 	rows := cl contents at: #rows.
-^rows isNotEmpty .
+	^ rows isNotEmpty
 ]
 
 { #category : 'incoming' }
@@ -560,7 +632,7 @@ News2 >> postValueComposition: inner ehrId: anEhrId [
 				anEhrId.
 				'composition' };
 		queryAt: 'format' put: 'FLAT';
-		queryAt: 'templateId' put: 'news2-christer-v0.2.0'.
+		queryAt: 'templateId' put: 'news2-christer-v0.2.1'.
 	comp := ZnEntity json: inner.
 	cl entity: comp.
 	cl post.
@@ -591,14 +663,14 @@ News2 >> processHl7: aHl7Msg [
 ]
 
 { #category : 'score engine' }
-News2 >> putNews2Composition: comp ehrId: anEhrId [
+News2 >> putNews2Composition: comp ehrId: anEhrId template: aTemplateId [
 
 	| cl versionedUid uid |
 	versionedUid := comp at: 'news2-christer/_uid'.
 	uid := versionedUid copyUpTo: $:.
 	cl := self ehrClient
 		      forJsonREST;
-		      contentReader: nil. 
+		      contentReader: nil.
 	"ehr/{{tolvan}}/composition?format=FLAT&templateId=news2-christer"
 	cl addPath: {
 			'ehr'.
@@ -607,7 +679,7 @@ News2 >> putNews2Composition: comp ehrId: anEhrId [
 			uid }.
 	cl
 		queryAt: 'format' put: 'FLAT';
-		queryAt: 'templateId' put: 'news2-christer'.
+		queryAt: 'templateId' put: aTemplateId.
 	cl headerAt: 'If-Match' put: versionedUid.
 
 	cl contents: comp.
@@ -632,7 +704,7 @@ News2 >> retrieveComp: twoIds [
 		queryAt: 'format' put: 'FLAT'.
 	cl get.
 	self assert: cl isSuccess.
-	^ cl contents
+	^{cl response headers. cl contents}
 ]
 
 { #category : 'score engine' }
@@ -646,8 +718,11 @@ News2 >> scoreAllPending [
 { #category : 'score engine' }
 News2 >> scoreOneComp: twoIds [
 
-	| compValues vals scores compNews |
-	compValues := self retrieveComp: twoIds.
+	| compValues vals scores compNews resp headers template |
+	resp := self retrieveComp: twoIds.
+	headers := resp first.
+	template := headers at: 'Ehrbase-Template-Id'.
+	compValues := resp second.
 	vals := self extractValsFromComp: compValues.
 	scores := self scoreValues: vals.
 	self calcTotalScore: scores.
@@ -655,10 +730,14 @@ News2 >> scoreOneComp: twoIds [
 	compNews := self compositionNews2: scores.
 	compValues addAll: compNews.
 	self setState: compValues.
-	"not working:
-	self setFeeder: compValues."
-	self putNews2Composition: compValues ehrId: twoIds first.
-	self traceCr: 'Scored one comp'
+	" working ?"
+	self setFeeder: compValues.
+	self
+		putNews2Composition: compValues
+		ehrId: twoIds first
+		template: template.
+	self traceCr: DateAndTime now asString , ' Scored one comp: '
+		, (compValues at: 'news2-christer/_uid')
 ]
 
 { #category : 'score' }
@@ -730,10 +809,10 @@ News2 >> setFeeder: comp [
 
 	| node feeder |
 	node := 'news2-christer/national_early_warning_score_2_news2/'.
-	feeder := node , '_feeder_audit/originating_system_audit/'.
+	feeder := node , '_feeder_audit/originating_system_audit|'.
 	comp
 		at: feeder , 'system_id' put: 'prototype scoring engine';
-		at: feeder , 'time_committed' put: DateAndTime now asString;
+		at: feeder , 'time' put: DateAndTime now asString;
 		at: feeder , 'version_id' put: 'v:0.1'
 ]
 

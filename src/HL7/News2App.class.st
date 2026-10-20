@@ -111,7 +111,7 @@ News2App >> renderUnscored: html [
 { #category : 'actions' }
 News2App >> scoreAll [
 
-	News2 new scoreAllPending .
+	[News2 new scoreAllPending] forkAt: 33 named: 'scoring'.
 ]
 
 { #category : 'updating' }
