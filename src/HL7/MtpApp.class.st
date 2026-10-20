@@ -2,7 +2,8 @@ Class {
 	#name : 'MtpApp',
 	#superclass : 'WAComponent',
 	#instVars : [
-		'patients'
+		'patients',
+		'patientComps'
 	],
 	#category : 'HL7-NEWS2',
 	#package : 'HL7',
@@ -35,22 +36,30 @@ MtpApp class >> register [
 	^ app
 ]
 
+{ #category : 'hooks' }
+MtpApp >> children [ ^patientComps
+]
+
 { #category : 'initialization' }
 MtpApp >> createPatients [
 
 	| p |
 	patients := OrderedCollection new.
-	p:= Dictionary new.
-	patients add: p.	p:= Dictionary new.
-	patients add: p.	p:= Dictionary new.
+	p := Dictionary new.
 	patients add: p.
+	p := Dictionary new.
+	patients add: p.
+	p := Dictionary new.
+	patients add: p
 ]
 
 { #category : 'initialization' }
 MtpApp >> initialize [
 
+	
 	super initialize.
-	 self createPatients
+	self createPatients.
+	patientComps := patients collect: [ :p | MtpPatient new patient:p ]
 ]
 
 { #category : 'rendering' }
@@ -62,7 +71,7 @@ MtpApp >> renderContentOn: html [
 			self renderHuvudOn: html.
 			self renderNyckelTalOn: html.
 			html div class: 'patienter'.
-			patients do: [ :pat | self renderPatientOn: html ].
+			patientComps do: [ :pat | pat renderOn: html ].
 			self renderFooter: html ]
 ]
 
@@ -104,14 +113,19 @@ MtpApp >> renderNyckelTalOn: html [
 		with: [
 			self
 				renderOneNyckelTal:
-					{ 'Patienter på tavlan'. 3. 'Sängar med pågående övervakning' }
+					{ 'Patienter på tavlan'. (patients size). 'Sängar med pågående övervakning' }
 				on: html.
-			self renderOneNyckelTal: { 'Kräver åtgärd nu'. 3. 'NEWS2 ≥ 5 eller enskild parameter 3 p' } on: html.
-			self renderOneNyckelTal: { 'Partiell bedömning'. 
-				1. 'Komponenter saknas eller är för gamla' } on: html.
 			self
-				renderOneNyckelTal: { 'Avvisade senaste timmen'.
-					3. 'Syns i granskningsvyn, kastas inte tyst' }
+				renderOneNyckelTal:
+					{ 'Kräver åtgärd nu'. 3. 'NEWS2 ≥ 5 eller enskild parameter 3 p' }
+				on: html.
+			self
+				renderOneNyckelTal:
+					{ 'Partiell bedömning'. 1. 'Komponenter saknas eller är för gamla' }
+				on: html.
+			self
+				renderOneNyckelTal:
+					{ 'Avvisade senaste timmen'. 3. 'Syns i granskningsvyn, kastas inte tyst' }
 				on: html ]
 ]
 
@@ -133,19 +147,6 @@ MtpApp >> renderOneNyckelTal: aList on: html [
 				class: 'fot';
 				with: aList third].
 			 ]
-]
-
-{ #category : 'rendering' }
-MtpApp >> renderPatientOn: html [
-
-	html details
-		class: 'patient';
-		with: [
-			html summary: [
-					html div
-						class: 'sang';
-						with: [ html tag: 'b' with: 'ads' ].
-					html text: 'patient X' ]. html div class:'harledning';with:[html heading level3;with:'Härledning — alla sju komponenter'] ]
 ]
 
 { #category : 'hooks' }

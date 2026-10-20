@@ -77,6 +77,15 @@ News2File >> archiveFile: file toFolder: arkivFolder [
 ]
 
 { #category : 'accessing' }
+News2File >> folders [
+
+^	Smalltalk os platformName = 'Win32'
+		ifTrue: [ #( 'C:\Pharo\images\HL7 - 12\inFolder'
+	              'P:\MTPHL7' ). ]
+		ifFalse: [  ]
+]
+
+{ #category : 'accessing' }
 News2File >> moveToInvalid: file folder: folder [
 
 	| invalidFolder |
@@ -93,8 +102,8 @@ News2File >> moveToInvalid: file folder: folder [
 News2File >> processFolders [
 
 	| folders |
-	folders := #( 'C:\Pharo\images\HL7 - 12\inFolder' 'P:\MTPHL7').
-	
+	folders := self folders.
+
 	folders do: [ :fld | self processOneFolder: fld ]
 ]
 
