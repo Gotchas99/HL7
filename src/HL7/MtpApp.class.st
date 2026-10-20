@@ -67,11 +67,12 @@ MtpApp >> renderContentOn: html [
 
 	html div
 		class: 'omslag';
-		with: [
+		with: [ 
 			self renderHuvudOn: html.
 			self renderNyckelTalOn: html.
-			html div class: 'patienter'.
-			patientComps do: [ :pat | pat renderOn: html ].
+			html div
+				class: 'patienter';
+				with: [ patientComps do: [ :pat | pat renderOn: html ] ].
 			self renderFooter: html ]
 ]
 
