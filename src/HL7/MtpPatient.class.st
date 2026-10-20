@@ -25,7 +25,9 @@ MtpPatient >> renderBidrag: bidrag on: html [
 
 	html span
 		class: 'bidrag';
-		with: [html tag:'b' with: bidrag first. html text:bidrag second]
+		with: [
+			html tag: 'b' with: bidrag first.
+			html text: ' ',bidrag second ]
 ]
 
 { #category : 'rendering' }
@@ -39,21 +41,51 @@ MtpPatient >> renderDrivandeOn: html [
 
 	| bidrag |
 	bidrag := #( 'Andningsfrekvens' '25/min · 3 p' 'Syremättnad'
-	             '91 % · 2 p' 'Puls' ' 131/min · 3 p' 'Systoliskt'
-	             ' 92 mmHg · 2 p' ).
-	bidrag pairsDo: [ :parm :val | self renderBidrag: {parm.val}on: html ]
+	             '91 % · 2 p' 'Puls' '131/min · 3 p' 'Systoliskt'
+	             '92 mmHg · 2 p' ).
+	bidrag pairsDo: [ :parm :val |
+		self
+			renderBidrag: {
+					parm.
+					val }
+			on: html ]
 ]
 
 { #category : 'rendering' }
 MtpPatient >> renderPatientDetailsOn: html [
 
-	
-			html div
-				class: 'harledning';
+	html div
+		style: 'display:none'; 
+		class: 'harledning';
+		with: [
+			html heading
+				level3;
+				with: 'Härledning — alla sju komponenter'.
+			html table
+				class: 'data';
 				with: [
-					html heading
-						level3;
-						with: 'Härledning — alla sju komponenter' ] 
+					html tableHead: [
+							html tableRow: [
+									html tableHeading: 'Komponent'.
+									html tableHeading
+										class: 'num';
+										with: 'Värde'.
+									html tableHeading: 'Enhet'.
+									html tableHeading
+										class: 'num';
+										with: 'Poäng'.
+									html tableHeading
+										class: 'num';
+										with: 'Kategori'.
+									html tableHeading
+										class: 'num';
+										with: 'Ursprung'.
+									html tableHeading
+										class: 'num';
+										with: 'Bearbetning'.
+									html tableHeading
+										class: 'num';
+										with: 'Ålder' ] ] ] ]
 ]
 
 { #category : 'rendering' }

@@ -133,9 +133,7 @@ MtpApp >> renderNyckelTalOn: html [
 { #category : 'rendering' }
 MtpApp >> renderOneNyckelTal: aList on: html [
 
-	html div
-		class: 'nyckeltal';
-		with: [
+	
 			html div
 				class: 'ruta';
 				with: [
@@ -144,10 +142,10 @@ MtpApp >> renderOneNyckelTal: aList on: html [
 						with: aList first.
 					html div
 						class: 'tal';
-						with: aList second .html div
-				class: 'fot';
-				with: aList third].
-			 ]
+						with: aList second.
+					html div
+						class: 'fot';
+						with: aList third ] 
 ]
 
 { #category : 'hooks' }
