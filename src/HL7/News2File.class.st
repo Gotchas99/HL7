@@ -85,6 +85,11 @@ News2File >> folders [
 		ifFalse: [  ]
 ]
 
+{ #category : 'testing' }
+News2File >> isRunning [ 
+^service isRunning
+]
+
 { #category : 'accessing' }
 News2File >> moveToInvalid: file folder: folder [
 
@@ -112,7 +117,9 @@ News2File >> processOneFolder: aPathString [
 
 	| folder arkivFolder fname file |
 	folder := aPathString asFileReference.
-	folder exists ifFalse: [Error signal:'Folder är inte tillgänglig. Är P: uppkopplad?'. ^ self ].
+	folder exists ifFalse: [
+		Error signal: 'Folder är inte tillgänglig. Är P: uppkopplad?'.
+		^ self ].
 	arkivFolder := folder / 'arkiv'.
 	arkivFolder ensureCreateDirectory.
 	[
@@ -122,7 +129,7 @@ News2File >> processOneFolder: aPathString [
 		[
 		News2 new processHl7: file contents.
 		self archiveFile: file toFolder: arkivFolder ]
-			on: Error
+			on: H7Invalid
 			do: [ self moveToInvalid: file folder: folder ] ]
 ]
 
@@ -131,7 +138,7 @@ News2File >> start [
 
 	<script: 'self stop;start'>
 	service := TKTParameterizableService new.
-	service name: 'HL7 watcher service'.
+	service name: 'HL7 file watcher service'.
 	"service onSetUpDo: [ Transcript show: 'File watcher started' ].
 	service onTearDownDo: [ Transcript show: 'File watcher finished' ]."
 	service step: [ self processFolders ].

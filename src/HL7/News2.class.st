@@ -91,13 +91,6 @@ News2 class >> setupMPI [
 
 { #category : 'incoming' }
 News2 >> addFeederAuditTransformer [
-
-	| tmp |
-	tmp := '"news2-christer/_feeder_audit/originating_system_item_ids:0|id": "{msh10}",
-  "news2-christer/_feeder_audit/originating_system_item_ids:0|type": "HL7_MSH_10",
-  "news2-christer/_feeder_audit/originating_system_item_ids:0|issuer": "CHA_NAL",
-'.
-
 	^ '
   "news2-christer/_feeder_audit/originating_system_audit|system_id": "{originating}",
   "news2-christer/_feeder_audit/originating_system_audit|time": "{timestamp}",
@@ -437,13 +430,13 @@ News2 >> deleteAllScoredEhr [
 News2 >> ehrClient [
 
 	| cl url |
-	"url := 'https://sandbox.ehrbase.org/ehrbase/rest/openehr/v1/'."
-	url := 'http://vgas5954.vgregion.se:8081/ehrbase/rest/openehr/v1/'.
+	"url := 'https://sandbox.ehrbase.org/ehrbase/rest/openehr/v1/'.""url := 'http://vgas5954.vgregion.se:8081/ehrbase/rest/openehr/v1/'."
+	url := 'http://datahub-cdr-poc.vgregion.se/ehrbase/rest/openehr/v1/'.
 	cl := ZnClient new url: url.
 	"cl
 		setBasicAuthenticationUsername: 'ehrbase-user'
 		password: 'SuperSecretPassword'."
-	cl beOneShot .
+	cl beOneShot.
 	cl headerAt: 'X-Requested-With' put: 'XMLHttpRequest'.
 	cl accept: 'application/json'.
 	^ cl
@@ -479,7 +472,7 @@ News2 >> extractFeeder: aHl7Msg [
 { #category : 'incoming' }
 News2 >> extractFromHl7: h7 [
 
-	|  pcd dict patient_id timestamp obr7 |
+	| pcd dict patient_id timestamp obr7 |
 	"h7 := (H7Parser on: aHl7) parse."
 	pcd := PcdMessage from: h7.
 	obr7 := ((h7 segment: #OBR) at: 7) last value.
@@ -495,8 +488,8 @@ News2 >> extractFromHl7: h7 [
 		at: #temperature
 		put: (pcd getFirstIdNo: #( 188420 150348 )) value.
 	patient_id := h7 pid patientId.
-	"namn: ((pcd hl7 segment: #pid) at:5) third."
 	dict at: #ehrid put: (self getEhrId: patient_id).
+	"namn: ((pcd hl7 segment: #pid) at:5) third."
 	"self assert: (dict values noneSatisfy: #isNil)."
 	^ dict
 ]
@@ -644,19 +637,23 @@ News2 >> postValueComposition: inner ehrId: anEhrId [
 News2 >> processHl7: aHl7Msg [
 
 	| inner dict feeder feederDict h7 msh10 |
-	h7 := (H7Parser on: aHl7Msg) parse.
+	h7 := (H7Parser on: aHl7Msg) parse. 
+	h7 pid patientId size < 10 ifTrue: [
+		H7Invalid signal: 'invalid patient id' ].
 	msh10 := (h7 msh at: 10) last value.
-	(self isDuplicate: msh10)ifTrue:[self halt.]ifFalse:[.
-	dict := self extractFromHl7: h7.
-	(dict values anySatisfy: #isNil) ifTrue: [
-		Error signal: 'some values are nil' ].
-	feederDict := self extractFeeder: aHl7Msg.
+	(self isDuplicate: msh10)
+		ifTrue: [ self halt ]
+		ifFalse: [
+			dict := self extractFromHl7: h7.
+			(dict values anySatisfy: #isNil) ifTrue: [
+				H7Invalid signal: 'some values are nil' ].
+			feederDict := self extractFeeder: aHl7Msg.
 
-	inner := self createValueCompFrom: dict.
-	feeder := self addFeederAuditTransformer format: feederDict.
-	self
-		postValueComposition: '{' , inner , ',' , feeder , '}'
-		ehrId: (dict at: #ehrid)].
+			inner := self createValueCompFrom: dict.
+			feeder := self addFeederAuditTransformer format: feederDict.
+			self
+				postValueComposition: '{' , inner , ',' , feeder , '}'
+				ehrId: (dict at: #ehrid) ].
 	self traceCr:
 		DateAndTime now asString , ' Stored one comp from HL7: '
 		, h7 pid patientId
