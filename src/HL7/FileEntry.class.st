@@ -45,6 +45,16 @@ FileEntry class >> filesFor: aPathString [
 ]
 
 { #category : 'as yet unclassified' }
+FileEntry class >> oldestFileFor: aPathString [
+
+	|  files |
+	
+	files := (self filesFor: aPathString ).
+	files isEmpty ifTrue:[^nil].
+	^files sorted first 
+]
+
+{ #category : 'as yet unclassified' }
 FileEntry >> <= anEntry [
 
 	^self creationDate <= anEntry creationDate 

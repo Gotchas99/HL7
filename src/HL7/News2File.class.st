@@ -115,22 +115,32 @@ News2File >> processFolders [
 { #category : 'accessing' }
 News2File >> processOneFolder: aPathString [
 
-	| folder arkivFolder fname file |
+	| folder arkivFolder file contents |
 	folder := aPathString asFileReference.
 	folder exists ifFalse: [
 		Error signal: 'Folder är inte tillgänglig. Är P: uppkopplad?'.
 		^ self ].
 	arkivFolder := folder / 'arkiv'.
 	arkivFolder ensureCreateDirectory.
-	[
-	fname := FileSystem disk store firstFileNameIn: aPathString asPath.
-	fname isNotNil ] whileTrue: [
-		file := folder / fname.
-		[
-		News2 new processHl7: file contents.
-		self archiveFile: file toFolder: arkivFolder ]
+	[ "fname := FileSystem disk store firstFileNameIn: aPathString asPath."
+	file := FileEntry oldestFileFor: aPathString.
+	file isNotNil ] whileTrue: [
+		| fileRef |
+		fileRef := folder / file fileName.
+		[ "	^ self readStreamEncoded: 'utf8'
+			readStreamDo: [ :stream | ^ stream contents ]
+		readStreamEncoded: anEncoding do: aBlock
+ZnCharacterEncoder		iso88591
+
+	^ self newForEncoding: 'iso-8859-1' 
+		"
+		contents := fileRef
+			            readStreamEncoded: 'iso-8859-1'
+			            do: [ :stream | contents := stream contents ].
+		News2 new processHl7: contents.
+		self archiveFile: fileRef toFolder: arkivFolder ]
 			on: H7Invalid
-			do: [ self moveToInvalid: file folder: folder ] ]
+			do: [ self moveToInvalid: fileRef folder: folder ] ]
 ]
 
 { #category : 'accessing' }
