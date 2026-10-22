@@ -133,8 +133,24 @@ News2 >> aqlAvdTavla [
   c/uid/value as composition_id, 
   c/name/value as template_name, 
   c/context/start_time/value as start_time,
-  o/data[at0001]/events[at0002]/data[at0003]/items[at0028]/value/magnitude AS total_score,
-  o/data[at0001]/events[at0002]/data[at0003]/items[at0056]/value/value AS risk_category
+ c/content[openEHR-EHR-OBSERVATION.respiration.v2]/data[at0001]/events[at0002]/data[at0003]/items[at0004]/value/magnitude AS resp_rate,
+  c/content[openEHR-EHR-OBSERVATION.news2.v1]/data[at0001]/events[at0002]/data[at0003]/items[at0006]/value/value AS resp_score,
+
+  c/content[openEHR-EHR-OBSERVATION.pulse_oximetry.v1]/data[at0001]/events[at0002]/data[at0003]/items[at0006]/value/numerator AS spo2,
+  c/content[openEHR-EHR-OBSERVATION.news2.v1]/data[at0001]/events[at0002]/data[at0003]/items[at0029]/value/value AS spo2_scale1_score,
+  c/content[openEHR-EHR-OBSERVATION.news2.v1]/data[at0001]/events[at0002]/data[at0003]/items[at0047]/value/value AS spo2_scale2_score,
+
+  c/content[openEHR-EHR-OBSERVATION.pulse.v2]/data[at0002]/events[at0003]/data[at0001]/items[at0004]/value/magnitude AS pulse,
+  c/content[openEHR-EHR-OBSERVATION.news2.v1]/data[at0001]/events[at0002]/data[at0003]/items[at0005]/value/value AS pulse_score,
+
+  c/content[openEHR-EHR-OBSERVATION.body_temperature.v2]/data[at0002]/events[at0003]/data[at0001]/items[at0004]/value/magnitude AS temperature,
+  c/content[openEHR-EHR-OBSERVATION.news2.v1]/data[at0001]/events[at0002]/data[at0003]/items[at0007]/value/value AS temp_score,
+
+  c/content[openEHR-EHR-OBSERVATION.blood_pressure.v2]/data[at0001]/events[at0006]/data[at0003]/items[at0004]/value/magnitude AS systolic,
+  c/content[openEHR-EHR-OBSERVATION.news2.v1]/data[at0001]/events[at0002]/data[at0003]/items[at0004]/value/value AS systolic_score,
+
+  c/content[openEHR-EHR-OBSERVATION.news2.v1]/data[at0001]/events[at0002]/data[at0003]/items[at0028]/value/magnitude AS total_score,
+  c/content[openEHR-EHR-OBSERVATION.news2.v1]/data[at0001]/events[at0002]/data[at0003]/items[at0056]/value/value AS risk_category
 
   FROM EHR e[ehr_id/value=$ehr_id] 
     CONTAINS COMPOSITION c 
@@ -293,9 +309,9 @@ News2 >> compositionTemplateNews2 [
 "news2-christer/national_early_warning_score_2_news2/consciousness|ordinal": 0,
 "news2-christer/national_early_warning_score_2_news2/consciousness|code": "at0024",
 "news2-christer/national_early_warning_score_2_news2/temperature|code": "at0039",
-"news2-christer/national_early_warning_score_2_news2/temperature|ordinal": 3,
+"news2-christer/national_early_warning_score_2_news2/temperature|ordinal": {temperature},
 "news2-christer/national_early_warning_score_2_news2/total_score": {total},
-"news2-christer/national_early_warning_score_2_news2/clinical_risk_category|value": "Low",
+"news2-christer/national_early_warning_score_2_news2/clinical_risk_category|value": "{risk}",
 "news2-christer/national_early_warning_score_2_news2/clinical_risk_category|code": "at0057",
 "news2-christer/national_early_warning_score_2_news2/clinical_risk_category|terminology": "local",
 "news2-christer/national_early_warning_score_2_news2/time": "{timestamp_news}"

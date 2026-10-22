@@ -57,9 +57,27 @@ MtpPatient >> renderContentOn: html [
 MtpPatient >> renderDrivandeOn: html [
 
 	| bidrag |
-	bidrag := #( 'Andningsfrekvens' '25/min · 3 p' 'Syremättnad'
-	             '91 % · 2 p' 'Puls' '131/min · 3 p' 'Systoliskt'
-	             '92 mmHg · 2 p' ).
+	bidrag := OrderedCollection new.
+	bidrag add: 'Andningsfrekvens'.
+	bidrag add: ('{1}/min · {2} p' format: {
+				 (pat at: 'resp_rate').
+				 (pat at: 'resp_score') }).
+	bidrag add: 'Syremättnad'.
+	bidrag add: ('{1}% · {2} p' format: {
+				 (pat at: 'spo2').
+				 (pat at: 'spo2_scale1_score') }).
+	bidrag add: 'Puls'.
+	bidrag add: ('{1}/min · {2} p' format: {
+				 (pat at: 'pulse').
+				 (pat at: 'pulse_score') }). 
+	bidrag add: 'Systoliskt'.
+	bidrag add: ('{1}mmHg · {2} p' format: {
+				 (pat at: 'systolic').
+				 (pat at: 'systolic_score') }).
+	bidrag add: 'Temperatur'.
+	bidrag add: ('{1} °C · {2} p' format: {
+				 (pat at: 'temperature').
+				 (pat at: 'temp_score') }).
 	bidrag pairsDo: [ :parm :val |
 		self
 			renderBidrag: {
