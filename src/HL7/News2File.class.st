@@ -122,19 +122,11 @@ News2File >> processOneFolder: aPathString [
 		^ self ].
 	arkivFolder := folder / 'arkiv'.
 	arkivFolder ensureCreateDirectory.
-	[ "fname := FileSystem disk store firstFileNameIn: aPathString asPath."
-	file := FileEntry oldestFileFor: aPathString.
+	[ 	self traceCr:[file := FileEntry oldestFileFor: aPathString]timeToRun .
 	file isNotNil ] whileTrue: [
 		| fileRef |
 		fileRef := folder / file fileName.
-		[ "	^ self readStreamEncoded: 'utf8'
-			readStreamDo: [ :stream | ^ stream contents ]
-		readStreamEncoded: anEncoding do: aBlock
-ZnCharacterEncoder		iso88591
-
-	^ self newForEncoding: 'iso-8859-1' 
-		"
-		contents := fileRef
+		[contents := fileRef
 			            readStreamEncoded: 'iso-8859-1'
 			            do: [ :stream | contents := stream contents ].
 		News2 new processHl7: contents.
@@ -149,8 +141,8 @@ News2File >> start [
 	<script: 'self stop;start'>
 	service := TKTParameterizableService new.
 	service name: 'HL7 file watcher service'.
-	"service onSetUpDo: [ Transcript show: 'File watcher started' ].
-	service onTearDownDo: [ Transcript show: 'File watcher finished' ]."
+	service onSetUpDo: [ self traceCr: 'File watcher started' ].
+	service onTearDownDo: [ self traceCr: 'File watcher finished' ].
 	service step: [ self processFolders ].
 	service stepDelay: 5 seconds.
 
@@ -159,6 +151,6 @@ News2File >> start [
 
 { #category : 'accessing' }
 News2File >> stop [
-
-	service stop.
+<script: 'self stop'>
+	service stop
 ]
