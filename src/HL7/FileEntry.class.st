@@ -55,6 +55,32 @@ FileEntry class >> oldestFileFor: aPathString [
 ]
 
 { #category : 'as yet unclassified' }
+FileEntry class >> oneFileEntryFor: aPathString [
+
+	|  openDir dirPointer entryData entry|
+		openDir := File primOpendir: aPathString.
+	openDir ifNil: [ self halt ].
+	dirPointer := openDir at: 3.
+	entryData := openDir.
+	[
+	[ entryData isNotNil ] whileTrue: [
+		entry:=self entryData: entryData.
+		entry isFile ifTrue:[^entry].
+			entryData := File primReaddir: dirPointer ] ] ensure: [
+		File primClosedir: dirPointer ].
+	^ nil
+]
+
+{ #category : 'as yet unclassified' }
+FileEntry class >> oneFileFor: aPathString [
+
+
+	| entry |
+	entry := self oneFileEntryFor: aPathString.
+	^ entry
+]
+
+{ #category : 'as yet unclassified' }
 FileEntry >> <= anEntry [
 
 	^self creationDate <= anEntry creationDate 
