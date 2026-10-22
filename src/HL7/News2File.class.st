@@ -77,6 +77,15 @@ News2File >> archiveFile: file toFolder: arkivFolder [
 ]
 
 { #category : 'accessing' }
+News2File >> findNextFile: aPathString [
+
+	| file |
+	file := FileEntry oneFileFor: aPathString.
+	"file := FileEntry oldestFileFor: aPathString."
+	^ file
+]
+
+{ #category : 'accessing' }
 News2File >> folders [
 
 ^	Smalltalk os platformName = 'Win32'
@@ -122,11 +131,13 @@ News2File >> processOneFolder: aPathString [
 		^ self ].
 	arkivFolder := folder / 'arkiv'.
 	arkivFolder ensureCreateDirectory.
-	[ 	self traceCr:[file := FileEntry oldestFileFor: aPathString]timeToRun .
+	[ 
+	self traceCr: [ file := self findNextFile: aPathString ] timeToRun.
 	file isNotNil ] whileTrue: [
 		| fileRef |
 		fileRef := folder / file fileName.
-		[contents := fileRef
+		[
+		contents := fileRef
 			            readStreamEncoded: 'iso-8859-1'
 			            do: [ :stream | contents := stream contents ].
 		News2 new processHl7: contents.

@@ -2,7 +2,9 @@ Class {
 	#name : 'MtpPatient',
 	#superclass : 'WAComponent',
 	#instVars : [
-		'pat'
+		'pat',
+		'riskTexts',
+		'riskStyles'
 	],
 	#category : 'HL7-NEWS2',
 	#package : 'HL7',
@@ -10,9 +12,24 @@ Class {
 }
 
 { #category : 'initialization' }
+MtpPatient >> initRiskMappings [
+
+	riskTexts := {
+		             ('Low' -> 'Låg').
+		             ('Low/Medium' -> 'Låg/medium').
+		             ('Medium' -> 'Medium').
+		             ('High' -> 'Hög') } asDictionary.
+	riskStyles := { ('Low' -> 'status-god').
+	 ('Low/Medium' -> 'status-varning').
+		             ('Medium' -> 'status-allvar').
+		             ('High' -> 'status-kritisk')  } asDictionary
+]
+
+{ #category : 'initialization' }
 MtpPatient >> initialize [
 
 	super initialize.
+	self initRiskMappings
 ]
 
 { #category : 'accessing' }
@@ -52,7 +69,7 @@ MtpPatient >> renderDrivandeOn: html [
 ]
 
 { #category : 'rendering' }
-MtpPatient >> renderPatientDetailsOn: html [
+MtpPatient >> renderHarledningOn: html [
 
 	html div
 		style: 'display:none'; 
@@ -107,7 +124,7 @@ MtpPatient >> renderPatientOn: html [
 						with: [
 							html div
 								class: 'varde';
-								with:  (pat at: 'total_score').
+								with: (pat at: 'total_score').
 							html div
 								class: 'av';
 								with: 'NEWS2' ].
@@ -122,15 +139,17 @@ MtpPatient >> renderPatientOn: html [
 						with: [
 							html span
 								class: 'status';
-								class: 'status-kritisk';
+								class: (riskStyles at:(pat at: 'risk_category')ifAbsent: ['status-okand']);
 								with: [
 									html span class: 'prick'.
-									html text: (pat at: 'risk_category') ].
+									html text: (riskTexts
+												 at: (pat at: 'risk_category')
+												 ifAbsent: [ pat at: 'risk_category' ]) ].
 							html div
 								class: 'sent';
-								with: 'äldsta delvärde 12 min' ].
-					html div
+								with: '' ]
+					"html div
 						class: 'pil';
-						with: [ html html: '&#9654;' ] ].
-			self renderPatientDetailsOn: html ]
+						with: [ html html: '&#9654;' ] " ].
+			self renderHarledningOn: html ]
 ]

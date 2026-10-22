@@ -154,13 +154,6 @@ News2 >> aqlBody: anAqlText params: aDict [
 	^ res
 ]
 
-{ #category : 'api' }
-News2 >> aqlGetAvdTavla [
-
-	| res |
-	res:= 6 collect:[:pnr|]. ^res
-]
-
 { #category : 'incoming' }
 News2 >> aqlMsh10: aMsh10 [
 
@@ -558,19 +551,17 @@ News2 >> getAvdTavla: aListOfPersonNr [
 	| res param ehr_id columnNames rows dict |
 	res := aListOfPersonNr collect: [ :pnr |
 		       ehr_id := self getEhrId: pnr.
-		       param := Dictionary new
-			                at: 'ehr_id' put: ehr_id;
-			                yourself.
+		       param := {'ehr_id' -> ehr_id} asDictionary .
 		       res := self aqlQuery: self aqlAvdTavla params: param.
 		       columnNames := (res at: 'columns') collect: [ :c |
 			                      c at: 'name' ].
-		       rows := (res at: 'rows') collect: [ :r | 
+		       rows := (res at: 'rows') collect: [ :r |
 			               dict := Dictionary new.
 			               1 to: r size do: [ :idx |
 			               dict at: (columnNames at: idx) put: (r at: idx) ].
-			               dict ] .
-		pnr -> rows first].
-	^ res asDictionary.
+			               dict ].
+		       pnr -> rows first ].
+	^ res asDictionary
 ]
 
 { #category : 'private' }
