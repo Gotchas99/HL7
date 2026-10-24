@@ -1,5 +1,5 @@
 Class {
-	#name : 'Empi',
+	#name : 'Mpi',
 	#superclass : 'Object',
 	#category : 'HL7-NEWS2',
 	#package : 'HL7',

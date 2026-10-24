@@ -1,6 +1,9 @@
 Class {
 	#name : 'News2',
 	#superclass : 'Object',
+	#instVars : [
+		'scoreCodes'
+	],
 	#classVars : [
 		'MPI'
 	],
@@ -271,8 +274,9 @@ News2 >> calcRisk: scores [
 { #category : 'score' }
 News2 >> calcTotalScore: scores [
 
-	|  total |
-	total := scores values sum.
+	|  total vals |
+	vals:=#( #respiration #spo #systolic #pulse #temperature ) collect: [ :id |scores at:id].
+	total := vals sum.
 	scores at: #total put: total.
 	^ scores
 ]
@@ -293,22 +297,20 @@ News2 >> compositionTemplateNews2 [
 
 	^ '\{
 "news2-christer/national_early_warning_score_2_news2/respiration_rate|ordinal": {respiration},
-"news2-christer/national_early_warning_score_2_news2/respiration_rate|code": "at0021",
+"news2-christer/national_early_warning_score_2_news2/respiration_rate|code": "{respiration_code}",
 "news2-christer/national_early_warning_score_2_news2/spo_scale_1|ordinal": {spo},
-"news2-christer/national_early_warning_score_2_news2/spo_scale_1|code": "at0033",
-"news2-christer/national_early_warning_score_2_news2/spo_scale_2|ordinal": {spo},
-"news2-christer/national_early_warning_score_2_news2/spo_scale_2|code": "at0061",
+"news2-christer/national_early_warning_score_2_news2/spo_scale_1|code": "{spo_code}",
 "news2-christer/national_early_warning_score_2_news2/air_or_oxygen|value": "Air",
 "news2-christer/national_early_warning_score_2_news2/air_or_oxygen|code": "at0036",
 "news2-christer/national_early_warning_score_2_news2/air_or_oxygen|ordinal": 0,
-"news2-christer/national_early_warning_score_2_news2/systolic_blood_pressure|code": "at0017",
+"news2-christer/national_early_warning_score_2_news2/systolic_blood_pressure|code": "{systolic_code}",
 "news2-christer/national_early_warning_score_2_news2/systolic_blood_pressure|ordinal": {systolic},
-"news2-christer/national_early_warning_score_2_news2/pulse|code": "at0010",
+"news2-christer/national_early_warning_score_2_news2/pulse|code": "{pulse_code}",
 "news2-christer/national_early_warning_score_2_news2/pulse|ordinal": {pulse},
 "news2-christer/national_early_warning_score_2_news2/consciousness|value": "Alert",
 "news2-christer/national_early_warning_score_2_news2/consciousness|ordinal": 0,
 "news2-christer/national_early_warning_score_2_news2/consciousness|code": "at0024",
-"news2-christer/national_early_warning_score_2_news2/temperature|code": "at0039",
+"news2-christer/national_early_warning_score_2_news2/temperature|code": "{temperature_code}",
 "news2-christer/national_early_warning_score_2_news2/temperature|ordinal": {temperature},
 "news2-christer/national_early_warning_score_2_news2/total_score": {total},
 "news2-christer/national_early_warning_score_2_news2/clinical_risk_category|value": "{risk}",
@@ -606,6 +608,12 @@ News2 >> getUnscored [
 	^ comps
 ]
 
+{ #category : 'initialization' }
+News2 >> initialize [
+
+super initialize .
+]
+
 { #category : 'incoming' }
 News2 >> isDuplicate: aMsh10 [
 
@@ -747,55 +755,75 @@ News2 >> scoreOneComp: twoIds [
 { #category : 'score' }
 News2 >> scorePulse: aVal [
 
-	aVal <= 40 ifTrue: [ ^ 3 ].
-	aVal <= 50 ifTrue: [ ^ 1 ].
-	aVal <= 90 ifTrue: [ ^ 0 ].
-	aVal <= 110 ifTrue: [ ^ 1 ].
-	aVal <= 130 ifTrue: [ ^ 2 ].
-	^ 3
+	aVal <= 40 ifTrue: [ ^ #(3 'at0010') ].
+	aVal <= 50 ifTrue: [ ^ #(1 'at0012') ].
+	aVal <= 90 ifTrue: [ ^ #(0 'at0013') ].
+	aVal <= 110 ifTrue: [ ^ #(1 'at0068') ].
+	aVal <= 130 ifTrue: [ ^ #(2 'at0011') ].
+	^ #(3 'at0065')
 ]
 
 { #category : 'score' }
 News2 >> scoreResp: aVal [
 
-	aVal <= 8 ifTrue: [ ^ 3 ].
-	aVal <= 11 ifTrue: [ ^ 1 ].
-	aVal <= 20 ifTrue: [ ^ 0 ].
-	aVal <= 24 ifTrue: [ ^ 2 ].
-	^ 3
+	aVal <= 8 ifTrue: [ ^ #( 3 'at0021' ) ]. 
+	aVal <= 11 ifTrue: [ ^ #( 1 'at0019' ) ].
+	aVal <= 20 ifTrue: [ ^ #( 0 'at0018' ) ].
+	aVal <= 24 ifTrue: [ ^ #( 2 'at0020' ) ].
+	^ #( 3 'at0064' )
 ]
 
 { #category : 'score' }
 News2 >> scoreSpo: aVal [
 
-	aVal <= 0.91 ifTrue: [ ^ 3 ].
-	aVal <= 0.93 ifTrue: [ ^ 2 ].
-	aVal <= 0.95 ifTrue: [ ^ 1 ].
-	^ 0
+	aVal <= 0.91 ifTrue: [ ^ #(3 'at0033') ].
+	aVal <= 0.93 ifTrue: [ ^ #( 2 'at0032') ].
+	aVal <= 0.95 ifTrue: [ ^ #(1 at0031 )].
+	^ #(0 'at0030')
 ]
 
 { #category : 'score' }
 News2 >> scoreSystolic: aVal [
 
-	aVal <= 90 ifTrue: [ ^ 3 ].
-	aVal <= 100 ifTrue: [ ^ 2 ].
-	aVal <= 110 ifTrue: [ ^ 1 ].
-	aVal <= 219 ifTrue: [ ^ 0 ].
-		^ 3
+	aVal <= 90 ifTrue: [ ^ #(3 'at0017') ].
+	aVal <= 100 ifTrue: [ ^ #(2 'at0016') ].
+	aVal <= 110 ifTrue: [ ^ #(1 'at0015') ].
+	aVal <= 219 ifTrue: [ ^ #(0 'at0014') ].
+	^ #(3 'at0067')
 ]
 
 { #category : 'score' }
-News2 >> scoreTemp:aVal [
-(	aVal <= 35.0)ifTrue:[^3].
-	(	aVal <= 36.0)ifTrue:[^1].
-		(	aVal <= 38.0)ifTrue:[^0]..
-			(	aVal <= 39.0)ifTrue:[^1].
-				^2
-	
+News2 >> scoreTemp: aVal [
+
+	aVal <= 35.0 ifTrue: [ ^ #(3 'at0039') ].
+	aVal <= 36.0 ifTrue: [ ^ #(1 'at0023') ].
+	aVal <= 38.0 ifTrue: [ ^ #(0 'at0022') ].
+	aVal <= 39.0 ifTrue: [ ^ #(1 'at0066') ].
+	^ #(2 'at0038')
 ]
 
 { #category : 'score' }
 News2 >> scoreValues: vals [
+
+	| dict res |
+	dict := Dictionary new.
+	dict at: #respiration put: (self scoreResp: (vals at: #respiration)).
+	dict at: #spo put: (self scoreSpo: (vals at: #spo)).
+	dict at: #systolic put: (self scoreSystolic: (vals at: #systolic)).
+	dict at: #pulse put: (self scorePulse: (vals at: #pulse)).
+	dict at: #temperature put: (self scoreTemp: (vals at: #temperature)).
+	 
+	res := Dictionary new.
+	#( #respiration #spo #systolic #pulse #temperature ) do: [ :id |
+		| val |
+		val := dict at: id.
+		res at: id put: val first.
+		res at: id , '_code' put: val second ].
+	^ res
+]
+
+{ #category : 'score' }
+News2 >> scoreValues_old: vals [
 
 	| dict |
 	dict := Dictionary new.
@@ -804,7 +832,7 @@ News2 >> scoreValues: vals [
 	dict at: #systolic put: (self scoreSystolic: (vals at: #systolic)).
 	dict at: #pulse put: (self scorePulse: (vals at: #pulse)).
 	dict at: #temperature put: (self scoreTemp: (vals at: #temperature)).
-	
+
 	^ dict
 ]
 

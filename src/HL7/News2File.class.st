@@ -131,8 +131,9 @@ News2File >> processOneFolder: aPathString [
 		^ self ].
 	arkivFolder := folder / 'arkiv'.
 	arkivFolder ensureCreateDirectory.
-	[ 
-	self traceCr: [ file := self findNextFile: aPathString ] timeToRun.
+	[
+	"self traceCr: [ file := self findNextFile: aPathString ] timeToRun."
+	 file := self findNextFile: aPathString.
 	file isNotNil ] whileTrue: [
 		| fileRef |
 		fileRef := folder / file fileName.
