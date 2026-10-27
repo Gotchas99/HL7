@@ -22,6 +22,7 @@ News2 class >> ehrIdFromPid:aPatientId [
 News2 class >> initialize [
 
 	self setupMPI.
+	self setupNeoConsole.
 ]
 
 { #category : 'sample' }
@@ -90,6 +91,13 @@ News2 class >> setupMPI [
 	MPI at: '201702022383' put: '68cddce0-ba4c-47fb-8693-5550b8073d35'.
 	MPI at: '200009262395' put: '7e533660-83dd-4965-b1cf-e857aeec9fea'.
 	MPI at: '199504182396' put: 'asdf'
+]
+
+{ #category : 'class initialization' }
+News2 class >> setupNeoConsole [
+
+	NeoConsoleTelnetServer managedServers do: [ :s | s stop: true ]. 
+	NeoConsoleTelnetServer startOn: 4999
 ]
 
 { #category : 'incoming' }
