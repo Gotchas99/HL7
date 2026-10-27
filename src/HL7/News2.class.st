@@ -6,6 +6,7 @@ Class {
 		'downSampling'
 	],
 	#classVars : [
+		'DownSampling',
 		'MPI'
 	],
 	#category : 'HL7-NEWS2',
@@ -22,8 +23,9 @@ News2 class >> ehrIdFromPid:aPatientId [
 { #category : 'class initialization' }
 News2 class >> initialize [
 
+	DownSampling := Dictionary new. 
 	self setupMPI.
-	self setupNeoConsole.
+	self setupNeoConsole
 ]
 
 { #category : 'sample' }
@@ -621,7 +623,7 @@ News2 >> getUnscored [
 News2 >> initialize [
 
 	super initialize.
-	downSampling:= Dictionary new.
+	
 ]
 
 { #category : 'incoming' }
@@ -666,12 +668,13 @@ News2 >> processHl7: aHl7Msg [
 	h7 pid patientId size < 10 ifTrue: [
 		H7Invalid signal: 'invalid patient id' ].
 	obr7 := ((h7 segment: #OBR) at: 7) last value.
-	timestamp := DateAndTime readYMDHMSfromDigits: obr7 readStream. 
+	timestamp := DateAndTime readYMDHMSfromDigits: obr7 readStream.
 	timestamp
-	< (downSampling at: h7 pid patientId ifAbsentPut: timestamp)
-		ifTrue: [
-			self halt.
-			^ self ].
+	< (DownSampling at: h7 pid patientId ifAbsentPut: timestamp) ifTrue: [
+		self traceCr:
+			'Skipping readout for: ' , h7 pid patientId ,' from: ',timestamp asString, ' until: '
+			, (DownSampling at: h7 pid patientId) asString.
+		^ self ].
 	msh10 := (h7 msh at: 10) last value.
 	(self isDuplicate: msh10)
 		ifTrue: [ self halt ]
@@ -685,13 +688,12 @@ News2 >> processHl7: aHl7Msg [
 			feeder := self addFeederAuditTransformer format: feederDict.
 			self
 				postValueComposition: '{' , inner , ',' , feeder , '}'
-				ehrId: (dict at: #ehrid) .
-				nextTime:= timestamp + 30 minutes .
-				downSampling at: h7 pid patientId ifAbsentPut: nextTime.
-				].
+				ehrId: (dict at: #ehrid).
+			nextTime := timestamp + 30 minutes.
+			DownSampling at: h7 pid patientId ifAbsentPut: nextTime ].
 	self traceCr:
 		DateAndTime now asString , ' Stored one comp from HL7: '
-		, h7 pid patientId
+		, h7 pid patientId, ' from: ',timestamp asString.
 ]
 
 { #category : 'score engine' }
