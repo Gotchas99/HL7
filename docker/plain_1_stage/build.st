@@ -1,5 +1,7 @@
 "build.st"
 
+Iceberg remoteTypeSelector: #httpsUrl.
+
 Metacello new
   repository: 'github://svenvc/zinc/repository';
   baseline: 'ZincHTTPComponents';
