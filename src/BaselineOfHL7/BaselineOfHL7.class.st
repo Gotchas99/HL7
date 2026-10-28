@@ -10,7 +10,7 @@ BaselineOfHL7 >> baseline: spec [
 
 	<baseline>
 	spec for: #common do: [
-		spec spec 
+		spec spec
 			baseline: 'NeoJSON'
 			with: [ spec repository: 'github://svenvc/NeoJSON/repository' ];
 			baseline: 'NeoConsole'
@@ -25,6 +25,6 @@ BaselineOfHL7 >> baseline: spec [
 			baseline: 'Seaside3'
 			with: [
 				spec repository: 'github://SeasideSt/Seaside:master/repository' ].
-		spec package: #HL7 with: [ spec requires: 'SQLite3' ].
+		spec package: #HL7 with: [ spec requires: #( 'NeoJSON' 'NeoConsole' 'Bootstrap5') ].
 		spec group: 'default' with: #( 'HL7' ) ]
 ]

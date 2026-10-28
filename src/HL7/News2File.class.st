@@ -21,7 +21,8 @@ News2File class >> default [
 { #category : 'class initialization' }
 News2File class >> initialize [
 
-	SessionManager default registerUserClassNamed: self name
+	SessionManager default registerUserClassNamed: self name.
+	self startUp: true.
 ]
 
 { #category : 'accessing' }
