@@ -4,9 +4,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl unzip ca-c
 
 WORKDIR /pharo
 
-COPY build.st run.st ./
-
 RUN curl get.pharo.org | bash
+
+COPY build.st run.st ./
 
 RUN ./pharo Pharo.image st --save --quit build.st
 
