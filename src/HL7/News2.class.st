@@ -28,6 +28,13 @@ News2 class >> initialize [
 	self setupNeoConsole
 ]
 
+{ #category : 'class initialization' }
+News2 class >> resetDownsampling [
+
+	DownSampling := Dictionary new.
+
+]
+
 { #category : 'sample' }
 News2 class >> sample_composition [
 ^'{
@@ -90,6 +97,7 @@ News2 class >> sample_composition [
 News2 class >> setupMPI [
 
 	MPI := Dictionary new.
+	MPI at: '191212121212' put: '118c83af-7b05-4539-987b-bb0b30198bf4'.
 	MPI at: '191212-1212' put: '118c83af-7b05-4539-987b-bb0b30198bf4'.
 	MPI at: '201702022383' put: '68cddce0-ba4c-47fb-8693-5550b8073d35'.
 	MPI at: '200009262395' put: '7e533660-83dd-4965-b1cf-e857aeec9fea'.
@@ -663,21 +671,26 @@ News2 >> postValueComposition: inner ehrId: anEhrId [
 { #category : 'incoming' }
 News2 >> processHl7: aHl7Msg [
 
-	| inner dict feeder feederDict h7 msh10 obr7 timestamp nextTime |
-	h7 := (H7Parser on: aHl7Msg) parse.
-	h7 pid patientId size < 10 ifTrue: [
-		H7Invalid signal: 'invalid patient id' ].
+	| inner dict feeder feederDict h7 pnr msh10 obr7 timestamp nextTime |
+	h7 := (H7Parser on: aHl7Msg) parse. 
+	pnr :=	h7 pid patientId.
+	pnr size < 10 ifTrue: [		H7Invalid signal: 'invalid patient id' ].
 	obr7 := ((h7 segment: #OBR) at: 7) last value.
 	timestamp := DateAndTime readYMDHMSfromDigits: obr7 readStream.
 	timestamp
-	< (DownSampling at: h7 pid patientId ifAbsentPut: timestamp) ifTrue: [
+	< (DownSampling at: pnr ifAbsentPut: timestamp) ifTrue: [
 		self traceCr:
-			'Skipping readout for: ' , h7 pid patientId ,' from: ',timestamp asString, ' until: '
+			'Skipping readout for: ' , pnr, ' from: '
+			, timestamp asString , ' until: '
 			, (DownSampling at: h7 pid patientId) asString.
 		^ self ].
 	msh10 := (h7 msh at: 10) last value.
 	(self isDuplicate: msh10)
-		ifTrue: [ self halt ]
+		ifTrue: [
+			self halt.
+			self traceCr:
+				DateAndTime now asString , ' Skipped duplicate comp from HL7: '
+				, pnr, ' from: ' , timestamp asString ]
 		ifFalse: [
 			dict := self extractFromHl7: h7.
 			(dict values anySatisfy: #isNil) ifTrue: [
@@ -690,10 +703,10 @@ News2 >> processHl7: aHl7Msg [
 				postValueComposition: '{' , inner , ',' , feeder , '}'
 				ehrId: (dict at: #ehrid).
 			nextTime := timestamp + 30 minutes.
-			DownSampling at: h7 pid patientId ifAbsentPut: nextTime ].
-	self traceCr:
-		DateAndTime now asString , ' Stored one comp from HL7: '
-		, h7 pid patientId, ' from: ',timestamp asString.
+			DownSampling at: pnr put: nextTime.
+			self traceCr:
+				DateAndTime now asString , ' Stored one comp from HL7: '
+				, pnr , ' from: ' , timestamp asString ]
 ]
 
 { #category : 'score engine' }
