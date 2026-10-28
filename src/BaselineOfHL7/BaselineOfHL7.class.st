@@ -10,7 +10,7 @@ BaselineOfHL7 >> baseline: spec [
 
 	<baseline>
 	spec for: #common do: [
-		spec spec
+		spec 
 			baseline: 'NeoJSON'
 			with: [ spec repository: 'github://svenvc/NeoJSON/repository' ];
 			baseline: 'NeoConsole'
