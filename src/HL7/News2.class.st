@@ -101,7 +101,7 @@ News2 class >> setupMPI [
 	MPI at: '191212-1212' put: '118c83af-7b05-4539-987b-bb0b30198bf4'.
 	MPI at: '201702022383' put: '68cddce0-ba4c-47fb-8693-5550b8073d35'.
 	MPI at: '200009262395' put: '7e533660-83dd-4965-b1cf-e857aeec9fea'.
-	MPI at: '199504182396' put: 'asdf'
+	MPI at: '199504182396' put: '0e1442db-55ff-4bbb-a9dc-a72a94d2442b'
 ]
 
 { #category : 'class initialization' }
