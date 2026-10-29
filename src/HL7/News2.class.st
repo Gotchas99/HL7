@@ -512,7 +512,7 @@ News2 >> extractFromHl7: h7 [
 	dict at: #timestamp put: timestamp asString.
 	dict at: #respiration put: (pcd getFirstIdNo: #( 151562 )) value.
 	dict at: #spo put: (pcd getIdNo: 150456) value.
-	dict at: #systolic put: (pcd getFirstIdNo: #( 150037 150033 )) value.
+	dict at: #systolic put: (pcd getFirstIdNo: #( 150021 150033 150037 )) value.
 	dict at: #pulse put: (pcd getIdNo: 149514) value.
 	dict
 		at: #temperature
