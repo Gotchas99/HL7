@@ -60,16 +60,28 @@ NpoCareDoc >> parseDoc: xml [
 	| dict header body code not |
 	dict := Dictionary new.
 	header := xml firstNode.
-	dict at:#patId put:( (header findElementNamed: 'patientId')contentStringAt:'extension').
-	dict at:#auth: put:( (header findElementNamed: 'author')contentStringAt:'name').
-	dict at: #careUnit: put:( (header findElementNamed: 'orgUnitName')contentString).
-	dict at:#timestamp: put: ( (header findElementNamed: 'author')contentStringAt:'timestamp').
-	body:= xml lastNode.
-	code:= (body  findElementNamed: 'code')contentString.
-	dict at:#typ put: (self anteckningstypLista at:code).
-	not:= self parseNote:((body  findElementNamed: 'clinicalDocumentNoteText')contentString).
-	dict at:#title put:not first.
-	dict at:#text put:not last.
+	dict
+		at: #patId
+		put:
+		((header findElementNamed: 'patientId') contentStringAt: 'extension').
+	dict
+		at: #auth
+		put: ((header findElementNamed: 'author') contentStringAt: 'name').
+	dict
+		at: #careUnit
+		put: (header findElementNamed: 'orgUnitName') contentString.
+	dict
+		at: #timestamp
+		put:
+		((header findElementNamed: 'author') contentStringAt: 'timestamp').
+	body := xml lastNode.
+	code := (body findElementNamed: 'code') contentString.
+	dict at: #typ put: (self anteckningstypLista at: code).
+	not := self parseNote:
+		       (body findElementNamed: 'clinicalDocumentNoteText')
+			       contentString.
+	dict at: #title put: not first.
+	dict at: #text put: not last.
 	^ dict
 ]
 
