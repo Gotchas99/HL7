@@ -2,7 +2,9 @@ Class {
 	#name : 'NpoApp',
 	#superclass : 'WAComponent',
 	#instVars : [
-		'docs'
+		'docs',
+		'allSamples',
+		'currentFile'
 	],
 	#category : 'HL7-NPO',
 	#package : 'HL7',
@@ -50,11 +52,9 @@ NpoApp >> formatTimestamp: s [
 { #category : 'initialization' }
 NpoApp >> initialize [
 
-	super initialize
-	"self createPatients.
-	self getValuesFromCdr.
-	patientComps := patients collect: [ :p | MtpPatient new patient: p ]".
+	super initialize.
 	docs := NpoCareDoc sampleBehandling.
+	allSamples:= NpoCareDoc allSamples.
 ]
 
 { #category : 'rendering' }
@@ -100,7 +100,20 @@ NpoApp >> renderFooter: html [
 { #category : 'rendering' }
 NpoApp >> renderHuvudOn: html [
 
-	html div with:[ html text:'Patient-ID: '; strong: (docs first at:#patId)]
+	| fileNames  |
+	fileNames := allSamples collect: #basenameWithoutExtension.
+	html div with: [
+		html
+			text: 'Patient-ID: ';
+			strong: (docs first at: #patId) ].
+	html form: [
+		html select
+			list: fileNames;
+			selected:currentFile;
+			callback: [ :val |
+				currentFile:= val.
+				self selectSample: val ];
+			onChange: 'this.form.submit()' ]
 ]
 
 { #category : 'rendering' }
@@ -115,6 +128,16 @@ NpoApp >> renderNote: aNote on: html [
 			  html div
 				  class: 'value';
 				  with: aNote last ]
+]
+
+{ #category : 'as yet unclassified' }
+NpoApp >> selectSample: aFileName [
+
+	| file |
+	currentFile := aFileName .
+	file := allSamples detect: [ :f |
+		        f basenameWithoutExtension = aFileName ].
+	docs := NpoCareDoc new on: file
 ]
 
 { #category : 'initialization' }

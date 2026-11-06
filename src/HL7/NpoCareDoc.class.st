@@ -7,6 +7,16 @@ Class {
 }
 
 { #category : 'as yet unclassified' }
+NpoCareDoc class >> allSamples [
+
+	| folders allFiles |
+	folders := #( '3 Content - SJF' '5 Content - ContractSpecific' ).
+	allFiles := folders collect: [ :fld |
+		            (self sampleRootFolder / fld) allFiles ].
+	^allFiles flattened
+]
+
+{ #category : 'as yet unclassified' }
 NpoCareDoc class >> sampleBehandling [
 
 | file |
