@@ -24,7 +24,12 @@ BaselineOfHL7 >> baseline: spec [
 				spec repository: 'github://astares/Seaside-Bootstrap5:master/src' ];
 			baseline: 'Seaside3'
 			with: [
-				spec repository: 'github://SeasideSt/Seaside:master/repository' ].
-		spec package: #HL7 with: [ spec requires: #( 'NeoJSON' 'NeoConsole' 'Bootstrap5') ].
+				spec repository: 'github://SeasideSt/Seaside:master/repository' ];
+			baseline: 'XMLParser'
+			with: [
+				spec repository: 'github://pharo-contributions/XML-XMLParser/src' ].
+		spec
+			package: #HL7
+			with: [ spec requires: #( 'NeoJSON' 'NeoConsole' 'Bootstrap5' 'XMLParser') ].
 		spec group: 'default' with: #( 'HL7' ) ]
 ]

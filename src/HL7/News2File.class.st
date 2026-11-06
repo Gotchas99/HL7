@@ -50,8 +50,8 @@ News2File class >> startUp: resuming [
 	We do this using deferred startup actions to allow normal error handling."
 
 	resuming ifTrue: [
-		SessionManager default currentSession addDeferredStartupAction: [ 
-			self start ] ]
+		SessionManager default currentSession addDeferredStartupAction: [
+			"self start" ] ]
 ]
 
 { #category : 'start-stop' }
