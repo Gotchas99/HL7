@@ -38,6 +38,60 @@ BokningsApp >> children [
 	^ #()
 ]
 
+{ #category : 'hooks' }
+BokningsApp >> createPatients [
+
+	| p patients |
+	patients := OrderedCollection new.
+	p := Dictionary new.
+	p at: 'personnr' put: '201702022383'.
+	p at: 'namn' put: 'Stinasson-af Klintberg'.
+	patients add: p.
+
+	p := Dictionary new.
+	p at: 'personnr' put: '200009262395'.
+	p at: 'namn' put: 'Maria Test Johansson'.
+	patients add: p
+
+	"p := Dictionary new.
+	199504182396
+	Risato^Clark Johan
+	patients add: p"
+]
+
+{ #category : 'hooks' }
+BokningsApp >> fhirClient [
+	"/Appointment?patient.identifier=191212121212&_include=Appointment:patient&_include=Appointment:location"
+
+	| base cl |
+	base := 'http://vgas5954.vgregion.se:8082/fhir/'.
+	cl := ZnClient new url: base.
+	cl beOneShot;
+	  forJsonREST.
+	^ cl
+]
+
+{ #category : 'hooks' }
+BokningsApp >> getBookingsForPatient: aPatientID [
+	"/Appointment?patient.identifier=191212121212&_include=Appointment:patient&_include=Appointment:location"
+
+	| cl |
+	cl := self fhirClient.
+	cl addPath: { 'Appointment' }.
+	cl
+		queryAt: 'patient.identifier' put: aPatientID;
+		queryAt: '_include' add: 'Appointment:patient';
+		queryAt: '_include' add: 'Appointment:location'.
+	"cl headerAt: 'If-Match' put: versionedUid."
+	cl get.
+	self assert: cl isSuccess.
+	^ cl  contents
+]
+
+{ #category : 'hooks' }
+BokningsApp >> getBookingsForUnit:aUnitID [
+]
+
 { #category : 'initialization' }
 BokningsApp >> initialize [
 
@@ -63,12 +117,10 @@ BokningsApp >> renderFooter: html [
 
 	html paragraph
 		class: 'notis';
-		with:
-			'x'.
+		with: ''.
 	^ html paragraph
 		  class: 'fot-not';
-		  with:
-			  'y'
+		  with: ''
 ]
 
 { #category : 'hooks' }
@@ -77,16 +129,10 @@ BokningsApp >> renderHuvudOn: html [
 	html div
 		class: 'huvud';
 		with: [
-			html div: [
-					html heading: 'IVA 3 — Early Warning Score'.
-					html paragraph:
-							'Mätvärden från patientövervakningen. Poängen är beräknad på lagrade värden, inte på monitorns display.' ].
-			html div
-				class: 'stampel';
-				with: [
-					html
-						tag: 'b' with: 'Uppdaterad ' , DateAndTime now asStringYMDHM;
-						text: 'Syntetiska demopatienter' ] ]
+				html div with: [
+		html
+			text: 'Patient-ID: ';
+			strong: ('1912121212') ]. ]
 ]
 
 { #category : 'hooks' }
