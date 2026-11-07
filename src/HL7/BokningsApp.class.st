@@ -1,6 +1,9 @@
 Class {
 	#name : 'BokningsApp',
 	#superclass : 'WAComponent',
+	#instVars : [
+		'bokningar'
+	],
 	#category : 'HL7-FHIR',
 	#package : 'HL7',
 	#tag : 'FHIR'
@@ -80,12 +83,13 @@ BokningsApp >> getBookingsForPatient: aPatientID [
 	cl addPath: { 'Appointment' }.
 	cl
 		queryAt: 'patient.identifier' put: aPatientID;
+		queryAt: 'status' put: 'booked';
 		queryAt: '_include' add: 'Appointment:patient';
 		queryAt: '_include' add: 'Appointment:location'.
 	"cl headerAt: 'If-Match' put: versionedUid."
 	cl get.
 	self assert: cl isSuccess.
-	^ cl  contents
+bokningar:= self parseBookingsPatient: cl contents
 ]
 
 { #category : 'hooks' }
@@ -96,10 +100,51 @@ BokningsApp >> getBookingsForUnit:aUnitID [
 BokningsApp >> initialize [
 
 	super initialize.
-
+	self getBookingsForPatient: '191212121212'
 ]
 
 { #category : 'hooks' }
+BokningsApp >> parseBookingsPatient: aResultSet [
+
+	| dict entry patRes pat loc appt rawAppt rawLoc res locRes refId |
+	entry := aResultSet at: #entry.
+
+	pat := Dictionary new. 
+	patRes := (entry detect: [ :r |
+		           (r at: #resource at: #resourceType) = 'Patient' ]) at:
+		          #resource.
+	pat at: #patNr put: ((patRes at: #identifier) first at: #value).
+	pat at: #name put: (((patRes at: #name) first at: #given)first asString,' ',((patRes at: #name) first at: #family)).
+
+	rawLoc := entry select: [ :e |
+		          (e at: #resource at: #resourceType) = 'Location' ].
+	loc := Dictionary new.
+	 rawLoc do: [ :l |
+		       res := l at: #resource.
+		       dict := Dictionary new.
+		       dict at: #id put: (res at: #id).
+		       dict at: #name put: (res at: #name).
+		       loc at: (dict at: #id) put: dict].
+
+	rawAppt := entry select: [ :e | (e at: #search at: #mode) = 'match' ].
+	appt := rawAppt collect: [ :a |
+		        res := a at: #resource.
+		        dict := Dictionary new.
+		        dict at: #start put: (res at: #start).
+		        dict at: #end put: (res at: #end).
+		        dict at: #pat put: pat.
+		        locRes := (res at: #participant)detect:[:p|(p at:#actor at:#reference) beginsWith: 'Location'].
+					refId:= ('/' split: (locRes at:#actor at:#reference))second.
+		        dict at: #loc put: (loc at:refId) ].
+
+	dict := Dictionary new.
+	dict at: #patient put: pat.
+	dict at: #loc put: loc.
+	dict at: #appt put: appt.
+	^ dict
+]
+
+{ #category : 'rendering' }
 BokningsApp >> renderContentOn: html [
 
 	html div
@@ -107,12 +152,12 @@ BokningsApp >> renderContentOn: html [
 		with: [
 			self renderHuvudOn: html.
 			html div
-				class: 'patienter';
+				class: 'bokningar';
 				with: [ " patientComps do: [ :pat | html render: pat ]" ].
 			self renderFooter: html ]
 ]
 
-{ #category : 'hooks' }
+{ #category : 'rendering' }
 BokningsApp >> renderFooter: html [
 
 	html paragraph
@@ -123,16 +168,16 @@ BokningsApp >> renderFooter: html [
 		  with: ''
 ]
 
-{ #category : 'hooks' }
+{ #category : 'rendering' }
 BokningsApp >> renderHuvudOn: html [
 
 	html div
 		class: 'huvud';
 		with: [
-				html div with: [
-		html
-			text: 'Patient-ID: ';
-			strong: ('1912121212') ]. ]
+			html div class:'patient_id';with: [
+					html
+						text: 'Patient-ID: ';
+						strong: '1912121212' ] ]
 ]
 
 { #category : 'hooks' }
