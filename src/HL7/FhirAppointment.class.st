@@ -55,7 +55,7 @@ FhirAppointment >> asDictionary [
 		at: #status put: self status;
 		at: #start put: startTime;
 		at: #end put: endTime;
-		at:#participants put: participants .
+		at: #participant put: participants.
 	^ dict
 ]
 

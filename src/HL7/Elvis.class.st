@@ -22,21 +22,48 @@ appt addLocation:(e at:#HSA_ID_team) displayName: (e at:#team_klartext).
 Elvis >> enterAppointments [
 
 	| elv apps |
-	elv:= self readFile .
-	apps:=elv collect:[:e|self createAppFromElvis:e].
-	self createBundle: apps.
-	self storeBundle.
+	elv := self readFile.
+	apps := elv collect: [ :e | self createAppFromElvis: e ].
+	apps do: [ :a |self storeApp: a ].
+	"bundle:=self createBundle: apps."
+	"self storeBundle: bundle"
+]
+
+{ #category : 'private' }
+Elvis >> fhirClient [
+	"/Appointment?patient.identifier=191212121212&_include=Appointment:patient&_include=Appointment:location"
+
+	| base cl |
+	base := 'http://vgas5954.vgregion.se:8082/fhir/'.
+	cl := ZnClient new url: base.
+	cl
+		beOneShot;
+		forJsonREST.
+	^ cl
 ]
 
 { #category : 'as yet unclassified' }
 Elvis >> readFile [
 
-	| fld file rd |
+	| fld file rd csv |
 	fld := 'C:\Users\chras8\OneDrive - Västra Götalandsregionen\VGR DataHub - Dokument\General\02 PoC\Aktiva\Bokning\Arbetsmaterial'
 		       asFileReference.
 	file := fld / 'elvis.csv'.
 	rd := NeoCSVReader on: file readStream.
 	rd separator: $;.
 	rd namedColumnsConfiguration.
-^	rd upToEnd
+	csv:=rd upToEnd.
+	^csv
+]
+
+{ #category : 'as yet unclassified' }
+Elvis >> storeApp: appt [
+
+	| cl |
+	cl := self fhirClient.
+	cl addPath: { 'Appointment' }.
+	"cl headerAt: 'If-None-Exist' put: <externt_bokningsID>."
+	cl contents: appt asDictionary .
+	cl post.
+	self assert: cl isSuccess
 ]

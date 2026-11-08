@@ -108,7 +108,7 @@ BokningsApp >> formatTime: aDateAndTime [
 BokningsApp >> getBookingsForPatient: aPatientID [
 	"/Appointment?patient.identifier=191212121212&_include=Appointment:patient&_include=Appointment:location"
 
-	| cl appts |
+	| cl  |
 	cl := self fhirClient.
 	cl addPath: { 'Appointment' }.
 	cl
@@ -215,7 +215,7 @@ BokningsApp >> renderAppt: appt on: html [
 				with: (self formatDuration: end - start).
 			html div
 				class: 'location';
-				with: (appt at: #loc) ]
+				with: (appt at: #loc at:#name) ]
 ]
 
 { #category : 'rendering' }
