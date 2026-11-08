@@ -41,7 +41,7 @@ BokningsApp >> children [
 	^ #()
 ]
 
-{ #category : 'hooks' }
+{ #category : 'data' }
 BokningsApp >> createPatients [
 
 	| p patients |
@@ -62,7 +62,7 @@ BokningsApp >> createPatients [
 	patients add: p"
 ]
 
-{ #category : 'hooks' }
+{ #category : 'private' }
 BokningsApp >> fhirClient [
 	"/Appointment?patient.identifier=191212121212&_include=Appointment:patient&_include=Appointment:location"
 
@@ -104,7 +104,7 @@ BokningsApp >> formatTime: aDateAndTime [
 	^ hour , ':' , minute
 ]
 
-{ #category : 'hooks' }
+{ #category : 'data' }
 BokningsApp >> getBookingsForPatient: aPatientID [
 	"/Appointment?patient.identifier=191212121212&_include=Appointment:patient&_include=Appointment:location"
 
@@ -123,7 +123,7 @@ BokningsApp >> getBookingsForPatient: aPatientID [
 	^ bokningar
 ]
 
-{ #category : 'hooks' }
+{ #category : 'data' }
 BokningsApp >> getBookingsForUnit: aUnitID [
 self flag:'intressant?'
 
@@ -142,22 +142,26 @@ BokningsApp >> monthNames [
 	^ #('jan' 'feb' 'mar' 'apr' 'maj' 'jun' 'jul' 'aug' 'sep' 'okt' 'nov' 'dec')
 ]
 
-{ #category : 'hooks' }
+{ #category : 'data' }
 BokningsApp >> parseBookingsPatient: aResultSet [
 
-	| dict entry patRes pat locations appts rawAppt rawLoc res locRes refId |
+	| dict entry locations appts rawAppt rawLoc res participant refId patients rawPat |
 	entry := aResultSet at: #entry.
 
-	pat := Dictionary new.
-	patRes := (entry detect: [ :r |
-		           (r at: #resource at: #resourceType) = 'Patient' ]) at:
-		          #resource.
-	pat at: #patNr put: ((patRes at: #identifier) first at: #value).
-	pat
-		at: #name
-		put: ((patRes at: #name) first at: #given) first asString , ' '
-			, ((patRes at: #name) first at: #family).
-
+	rawPat := entry select: [ :e |
+		          (e at: #resource at: #resourceType) = 'Patient' ].
+	patients := Dictionary new.
+	rawPat do: [ :p |
+		res := p at: #resource.
+		dict := Dictionary new.
+		dict at: #id put: (res at: #id).
+		dict at: #patNr put: ((res at: #identifier) first at: #value).
+		dict
+			at: #name
+			put: ((res at: #name) first at: #given) first asString , ' '
+				, ((res at: #name) first at: #family).
+		patients at: (dict at: #id) put: dict ].
+	"-------------------------------"
 	rawLoc := entry select: [ :e |
 		          (e at: #resource at: #resourceType) = 'Location' ].
 	locations := Dictionary new.
@@ -167,27 +171,29 @@ BokningsApp >> parseBookingsPatient: aResultSet [
 		dict at: #id put: (res at: #id).
 		dict at: #name put: (res at: #name).
 		locations at: (dict at: #id) put: dict ].
-
+	"--------------------------------"
 	rawAppt := entry select: [ :e | (e at: #search at: #mode) = 'match' ].
 	appts := rawAppt collect: [ :a |
-		        res := a at: #resource.
-		        dict := Dictionary new.
-		        dict at: #start put: (res at: #start).
-		        dict at: #end put: (res at: #end).
-		        dict at: #pat put: pat.
-		        locRes := (res at: #participant) detect: [ :p |
-			                  (p at: #actor at: #reference) beginsWith:
-				                  'Location' ].
-		        refId := ('/' split: (locRes at: #actor at: #reference))
-			                 second.
-		        dict at: #loc put: (locations at: refId).
-		        dict ].
-appts:=appts asSortedCollection: [ :a :b | (a at: #start) <= (b at: #start) ].
-	dict := Dictionary new.
-	dict at: #patient put: pat.
-	dict at: #loc put: locations.
-	dict at: #appt put: appts.
-	^ dict
+		         res := a at: #resource.
+		         dict := Dictionary new.
+		         dict at: #start put: (res at: #start).
+		         dict at: #end put: (res at: #end).
+		         participant := (res at: #participant) detect: [ :p |
+			                        (p at: #actor at: #reference) beginsWith:
+				                        'Patient' ].
+		         refId := ('/' split:
+			                   (participant at: #actor at: #reference)) second.
+		         dict at: #pat put: (patients at: refId).
+		         participant := (res at: #participant) detect: [ :p |
+			                        (p at: #actor at: #reference) beginsWith:
+				                        'Location' ].
+		         refId := ('/' split:
+			                   (participant at: #actor at: #reference)) second.
+		         dict at: #loc put: (locations at: refId).
+		         dict ].
+	appts := appts asSortedCollection: [ :a :b |
+		         (a at: #start) <= (b at: #start) ].
+	^ appts
 ]
 
 { #category : 'rendering' }
@@ -213,15 +219,15 @@ BokningsApp >> renderAppt: appt on: html [
 
 { #category : 'rendering' }
 BokningsApp >> renderContentOn: html [
+	" patientComps do: [ :pat | html render: pat ]"
 
-	html div
+	html div 
 		class: 'omslag';
 		with: [
 			self renderHuvudOn: html.
 			html div
 				class: 'bokningar';
-				with: [ " patientComps do: [ :pat | html render: pat ]"
-					(bokningar at: #appt) do: [ :a | self renderAppt: a on: html ] ].
+				with: [ bokningar do: [ :a | self renderAppt: a on: html ] ].
 			self renderFooter: html ]
 ]
 
@@ -243,8 +249,8 @@ BokningsApp >> renderFooter: html [
 
 	html paragraph
 		class: 'notis';
-		with: 'Bokningsöversikt'.
-	^ html paragraph 
+		with: 'Bokningsöversikt för patient'.
+	^ html paragraph
 		  class: 'fot-not';
 		  with: ''
 ]
@@ -256,12 +262,12 @@ BokningsApp >> renderHuvudOn: html [
 		class: 'huvud';
 		with: [
 			html div
-				class: 'patient_id';
+				class: 'patient_id'; 
 				with: [
 					html
-						text: 'Patient-ID: ';
-						strong: '1912121212' ] .
-					html span: (bokningar  at:#patient at:#name)]
+						span: 'Patient-ID: ';
+						strong: (bokningar first at: #pat at: #patNr) ].
+			html span: (bokningar first at: #pat at: #name) ]
 ]
 
 { #category : 'hooks' }
