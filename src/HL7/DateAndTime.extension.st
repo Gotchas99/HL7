@@ -1,6 +1,14 @@
 Extension { #name : 'DateAndTime' }
 
 { #category : '*HL7' }
+DateAndTime class >> neoJsonMapping: mapper [
+
+	mapper for: self customDo: [ :mapping |
+		mapping decoder: [ :string | self fromString: string ].
+		mapping encoder: [ :dateAndTime | dateAndTime printString ] ]
+]
+
+{ #category : '*HL7' }
 DateAndTime class >> readYMDHMSfromDigits: stream [
 	"Read a separate Date and Time from stream to instanciate the receiver.
 	See also #printSeparateDateAndTimeOn:"
