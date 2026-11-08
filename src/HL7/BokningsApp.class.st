@@ -119,8 +119,7 @@ BokningsApp >> getBookingsForPatient: aPatientID [
 	"cl headerAt: 'If-Match' put: versionedUid."
 	cl get.
 	self assert: cl isSuccess.
-	appts := self parseBookingsPatient: cl contents.
-	bokningar := appts asSortedCollection: [ :a :b | (a at: #start) <= (b at: #start) ].
+	bokningar := self parseBookingsPatient: cl contents.
 	^ bokningar
 ]
 
@@ -146,42 +145,48 @@ BokningsApp >> monthNames [
 { #category : 'hooks' }
 BokningsApp >> parseBookingsPatient: aResultSet [
 
-	| dict entry patRes pat loc appt rawAppt rawLoc res locRes refId |
+	| dict entry patRes pat locations appts rawAppt rawLoc res locRes refId |
 	entry := aResultSet at: #entry.
 
-	pat := Dictionary new. 
+	pat := Dictionary new.
 	patRes := (entry detect: [ :r |
 		           (r at: #resource at: #resourceType) = 'Patient' ]) at:
 		          #resource.
 	pat at: #patNr put: ((patRes at: #identifier) first at: #value).
-	pat at: #name put: (((patRes at: #name) first at: #given)first asString,' ',((patRes at: #name) first at: #family)).
+	pat
+		at: #name
+		put: ((patRes at: #name) first at: #given) first asString , ' '
+			, ((patRes at: #name) first at: #family).
 
 	rawLoc := entry select: [ :e |
 		          (e at: #resource at: #resourceType) = 'Location' ].
-	loc := Dictionary new.
-	 rawLoc do: [ :l |
-		       res := l at: #resource.
-		       dict := Dictionary new.
-		       dict at: #id put: (res at: #id).
-		       dict at: #name put: (res at: #name).
-		       loc at: (dict at: #id) put: dict].
+	locations := Dictionary new.
+	rawLoc do: [ :l |
+		res := l at: #resource.
+		dict := Dictionary new.
+		dict at: #id put: (res at: #id).
+		dict at: #name put: (res at: #name).
+		locations at: (dict at: #id) put: dict ].
 
 	rawAppt := entry select: [ :e | (e at: #search at: #mode) = 'match' ].
-	appt := rawAppt collect: [ :a |
+	appts := rawAppt collect: [ :a |
 		        res := a at: #resource.
 		        dict := Dictionary new.
 		        dict at: #start put: (res at: #start).
 		        dict at: #end put: (res at: #end).
 		        dict at: #pat put: pat.
-		        locRes := (res at: #participant)detect:[:p|(p at:#actor at:#reference) beginsWith: 'Location'].
-					refId:= ('/' split: (locRes at:#actor at:#reference))second.
-		        dict at: #loc put: (loc at:refId) .
-		dict].
-
+		        locRes := (res at: #participant) detect: [ :p |
+			                  (p at: #actor at: #reference) beginsWith:
+				                  'Location' ].
+		        refId := ('/' split: (locRes at: #actor at: #reference))
+			                 second.
+		        dict at: #loc put: (locations at: refId).
+		        dict ].
+appts:=appts asSortedCollection: [ :a :b | (a at: #start) <= (b at: #start) ].
 	dict := Dictionary new.
 	dict at: #patient put: pat.
-	dict at: #loc put: loc.
-	dict at: #appt put: appt.
+	dict at: #loc put: locations.
+	dict at: #appt put: appts.
 	^ dict
 ]
 
