@@ -13,6 +13,8 @@ BaselineOfHL7 >> baseline: spec [
 		spec 
 			baseline: 'NeoJSON'
 			with: [ spec repository: 'github://svenvc/NeoJSON/repository' ];
+			baseline: 'NeoCSV'
+			with: [ spec repository: 'github://svenvc/NeoCSV/repository' ];
 			baseline: 'NeoConsole'
 			with: [ spec repository: 'github://svenvc/NeoConsole/src' ];
 			baseline: 'SQLite3'
@@ -30,6 +32,7 @@ BaselineOfHL7 >> baseline: spec [
 				spec repository: 'github://pharo-contributions/XML-XMLParser/src' ].
 		spec
 			package: #HL7
-			with: [ spec requires: #( 'NeoJSON' 'NeoConsole' 'Bootstrap5' 'XMLParser') ].
+			with: [
+			spec requires: #( 'NeoJSON' 'NeoConsole' 'Bootstrap5' 'XMLParser' ) ].
 		spec group: 'default' with: #( 'HL7' ) ]
 ]
