@@ -146,6 +146,7 @@ BokningsApp >> monthNames [
 BokningsApp >> parseBookingsPatient: aResultSet [
 
 	| dict entry locations appts rawAppt rawLoc res participant refId patients rawPat |
+	(aResultSet total)=0 ifTrue:[^#()].
 	entry := aResultSet at: #entry.
 
 	rawPat := entry select: [ :e |
@@ -261,13 +262,19 @@ BokningsApp >> renderHuvudOn: html [
 	html div
 		class: 'huvud';
 		with: [
-			html div
-				class: 'patient_id'; 
+			bokningar ifNotEmpty: 
+			[html div
+				class: 'patient_id';
 				with: [
 					html
 						span: 'Patient-ID: ';
 						strong: (bokningar first at: #pat at: #patNr) ].
-			html span: (bokningar first at: #pat at: #name) ]
+			html span class:'patientName' ;with: (bokningar first at: #pat at: #name) ]
+		ifEmpty: 
+		[ html text: 'Inga bokningar' ]
+		]
+		
+	 
 ]
 
 { #category : 'hooks' }
