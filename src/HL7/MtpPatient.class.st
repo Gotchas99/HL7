@@ -137,6 +137,7 @@ MtpPatient >> renderPatientOn: html [
 								text: 'IVA-03';
 								tag: 'b' with: (pat at: 'namn');
 								text: (pat at: 'personnr') ].
+							(pat includesKey:'total_score')ifFalse:[^self].
 					html div
 						class: 'poang';
 						with: [

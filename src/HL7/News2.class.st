@@ -590,7 +590,7 @@ News2 >> getAvdTavla: aListOfPersonNr [
 	| res param ehr_id columnNames rows dict |
 	res := aListOfPersonNr collect: [ :pnr |
 		       ehr_id := self getEhrId: pnr.
-		       param := {'ehr_id' -> ehr_id} asDictionary .
+		       param := { ('ehr_id' -> ehr_id) } asDictionary.
 		       res := self aqlQuery: self aqlAvdTavla params: param.
 		       columnNames := (res at: 'columns') collect: [ :c |
 			                      c at: 'name' ].
@@ -599,7 +599,9 @@ News2 >> getAvdTavla: aListOfPersonNr [
 			               1 to: r size do: [ :idx |
 			               dict at: (columnNames at: idx) put: (r at: idx) ].
 			               dict ].
-		       pnr -> rows first ].
+		       rows
+			       ifEmpty: [ pnr -> Dictionary new ]
+			       ifNotEmpty: [ pnr -> rows first ] ].
 	^ res asDictionary
 ]
 
