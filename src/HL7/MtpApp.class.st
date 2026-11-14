@@ -100,10 +100,10 @@ MtpApp >> renderFooter: html [
 		class: 'notis';
 		with:
 			'Medvetandegrad och tillförd syrgas mäts inte av monitorn. De är antagna där inget annat anges, och en bedömning som bygger på antaganden kallas aldrig bara ''NEWS2'' utan redovisas som partiell.'.
-	^ html paragraph
+	"^ html paragraph
 		  class: 'fot-not';
 		  with:
-			  'Klicka på en rad för att se härledningen per komponent. Trendkurvan visar NEWS2 de senaste fyra timmarna, en punkt per halvtimme. Larm hanteras av övervakningssystemet — tavlan larmar inte.'
+			  'Klicka på en rad för att se härledningen per komponent. Trendkurvan visar NEWS2 de senaste fyra timmarna, en punkt per halvtimme. Larm hanteras av övervakningssystemet — tavlan larmar inte.'"
 ]
 
 { #category : 'rendering' }

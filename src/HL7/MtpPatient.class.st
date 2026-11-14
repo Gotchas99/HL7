@@ -137,7 +137,7 @@ MtpPatient >> renderPatientOn: html [
 								text: 'IVA-03';
 								tag: 'b' with: (pat at: 'namn');
 								text: (pat at: 'personnr') ].
-							(pat includesKey:'total_score')ifFalse:[^self].
+					(pat includesKey: 'total_score') ifTrue:  [ 
 					html div
 						class: 'poang';
 						with: [
@@ -155,10 +155,15 @@ MtpPatient >> renderPatientOn: html [
 						with: [ html tag: 'b' with: '<trendgraf>' ].
 					html div
 						class: 'alder';
-						with: [
+						with: [ "html div
+						class: 'pil';
+						with: [ html html: '&#9654;' ] "
 							html span
 								class: 'status';
-								class: (riskStyles at:(pat at: 'risk_category')ifAbsent: ['status-okand']);
+								class:
+									(riskStyles
+										 at: (pat at: 'risk_category')
+										 ifAbsent: [ 'status-okand' ]);
 								with: [
 									html span class: 'prick'.
 									html text: (riskTexts
@@ -166,9 +171,6 @@ MtpPatient >> renderPatientOn: html [
 												 ifAbsent: [ pat at: 'risk_category' ]) ].
 							html div
 								class: 'sent';
-								with: '' ]
-					"html div
-						class: 'pil';
-						with: [ html html: '&#9654;' ] " ].
-			self renderHarledningOn: html ]
+								with: '' ] ].
+			self renderHarledningOn: html ]]
 ]

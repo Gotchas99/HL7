@@ -134,10 +134,11 @@ NpoApp >> renderNote: aNote on: html [
 NpoApp >> selectSample: aFileName [
 
 	| file |
-	currentFile := aFileName .
+	currentFile := aFileName.
 	file := allSamples detect: [ :f |
 		        f basenameWithoutExtension = aFileName ].
-	docs := NpoCareDoc new on: file
+	docs := NpoCareDoc new onTestFile: file.
+	
 ]
 
 { #category : 'initialization' }
