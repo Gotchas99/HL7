@@ -1,9 +1,9 @@
 Class {
 	#name : 'NpoCareDoc',
 	#superclass : 'Object',
-	#category : 'HL7-NPO',
+	#category : 'HL7-PatSummary',
 	#package : 'HL7',
-	#tag : 'NPO'
+	#tag : 'PatSummary'
 }
 
 { #category : 'as yet unclassified' }
