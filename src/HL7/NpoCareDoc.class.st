@@ -66,8 +66,8 @@ NpoCareDoc >> fillFlat: aFlatTemplate with: aDict [
 { #category : 'flats' }
 NpoCareDoc >> flatFeeder [
 
-	^'
-"visit_note/_feeder_audit/originating_system_audit|system_id": "SE2321000131-S000000002253",
+	^ '
+  "visit_note/_feeder_audit/originating_system_audit|system_id": "SE2321000131-S000000002253",
   "visit_note/_feeder_audit/originating_system_audit|time": "2025-10-06T11:35:08+02:00",
   "visit_note/_feeder_audit/originating_system_item_id:0|id": "melior:voo:sourcesystem:4016|tst_a_fss:folderid:319328:activityid:250:termid:1511",
   "visit_note/_feeder_audit/originating_system_item_id:0|type": "RIV_RECORD_ID",

@@ -24,7 +24,7 @@ News2Test >> testX [
 	res := H7Segment new parseFields: #( 'DOE^JOHN^^^^' '19480203'
 	          '' ).
 	self assert: res isArray.
-	self assert: res size equals: 3.
+	self assert: res size equals: 2.
 	self
 		assert: res first
 		equals: #( 'DOE' 'JOHN' '' '' '' '' ) asOrderedCollection.

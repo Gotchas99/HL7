@@ -7,7 +7,7 @@ Class {
 }
 
 { #category : 'as yet unclassified' }
-Elvis >> createAppFromElvis: e [
+Elvis >> createApptFromElvis: e [
 
 	| appt |
 	appt:= FhirAppointment new.
@@ -23,7 +23,7 @@ Elvis >> enterAppointments [
 
 	| elv apps |
 	elv := self readFile.
-	apps := elv collect: [ :e | self createAppFromElvis: e ].
+	apps := elv collect: [ :e | self createApptFromElvis: e ].
 	apps do: [ :a |self storeApp: a ].
 	"bundle:=self createBundle: apps."
 	"self storeBundle: bundle"
@@ -46,14 +46,26 @@ Elvis >> fhirClient [
 Elvis >> readFile [
 
 	| fld file rd csv |
-	fld := 'C:\Users\chras8\OneDrive - Västra Götalandsregionen\VGR DataHub - Dokument\General\02 PoC\Aktiva\Bokning\Arbetsmaterial'
+	fld := 'C:\Users\chras8\OneDrive - Västra Götalandsregionen\VGR DataHub - Dokument\General\02 PoC\Aktiva\Bokning\Arbetsmaterial\Testdata'
 		       asFileReference.
 	file := fld / 'elvis.csv'.
 	rd := NeoCSVReader on: file readStream.
 	rd separator: $;.
 	rd namedColumnsConfiguration.
-	csv:=rd upToEnd.
-	^csv
+	csv := rd upToEnd.
+	^ csv
+]
+
+{ #category : 'as yet unclassified' }
+Elvis >> readFileHL7 [
+
+	| fld file tmp |
+	fld := 'C:\Users\chras8\OneDrive - Västra Götalandsregionen\VGR DataHub - Dokument\General\02 PoC\Aktiva\Bokning\Arbetsmaterial\Testdata'
+		       asFileReference.
+	file := fld / 'axel hl7.txt'.
+	tmp := '----------' split: file contents.
+	tmp := tmp collect: [ :msg | (H7Parser on: msg) parse ].
+	^ tmp
 ]
 
 { #category : 'as yet unclassified' }

@@ -84,7 +84,9 @@ Composition >> template [ ^template
 ]
 
 { #category : 'accessing' }
-Composition >> templatePrefix^templatePrefix [
+Composition >> templatePrefix [ 
+
+	^ templatePrefix
 ]
 
 { #category : 'accessing' }

@@ -1,7 +1,7 @@
 Class {
 	#name : 'MpiFake',
 	#superclass : 'Mpi',
-	#category : 'HL7-NEWS2',
+	#category : 'HL7-FHIR',
 	#package : 'HL7',
-	#tag : 'NEWS2'
+	#tag : 'FHIR'
 }
