@@ -1,5 +1,5 @@
 Class {
-	#name : 'FHIR',
+	#name : 'FhirResource',
 	#superclass : 'Object',
 	#category : 'HL7-FHIR',
 	#package : 'HL7',
@@ -7,7 +7,7 @@ Class {
 }
 
 { #category : 'converting' }
-FHIR >> asDictionary [
+FhirResource >> asDictionary [
 
 	| dict |
 	dict:= Dictionary new.
@@ -16,7 +16,7 @@ FHIR >> asDictionary [
 ]
 
 { #category : 'converting' }
-FHIR >> asJSON [
+FhirResource >> asJSON [
 
 	| dict |
 	dict := self asDictionary.
@@ -24,12 +24,14 @@ FHIR >> asJSON [
 ]
 
 { #category : 'initialization' }
-FHIR >> initialize [
+FhirResource >> initialize [
 
 	super initialize.
 ]
 
-{ #category : 'as yet unclassified' }
-FHIR >> resourceType [
-	self subclassResponsibility 
+{ #category : 'accessing' }
+FhirResource >> resourceType [
+
+	"self subclassResponsibility"
+	^self class name allButFirst:4.
 ]

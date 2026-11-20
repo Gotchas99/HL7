@@ -1,6 +1,6 @@
 Class {
 	#name : 'FhirAppointment',
-	#superclass : 'FHIR',
+	#superclass : 'FhirResource',
 	#instVars : [
 		'startTime',
 		'endTime',
@@ -69,11 +69,6 @@ FhirAppointment >> initialize [
 
 	super initialize.
 	participants:=OrderedCollection new.
-]
-
-{ #category : 'accessing' }
-FhirAppointment >> resourceType [ 
-^'Appointment'
 ]
 
 { #category : 'accessing' }
