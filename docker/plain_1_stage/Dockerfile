@@ -13,7 +13,7 @@ COPY deps.st ./
 RUN ./pharo Pharo.image st --save --quit deps.st
 
 COPY build.st ./
-ADD https://api.github.com/repos/Gotchas99/HL7/git/refs/heads/main /tmp/tvprog3-ref.json
+ADD https://api.github.com/repos/Gotchas99/HL7/git/refs/heads/main /tmp/hl7-ref.json
 RUN ./pharo Pharo.image st --save --quit build.st
 
 COPY run.st ./
