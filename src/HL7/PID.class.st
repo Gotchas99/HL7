@@ -19,8 +19,9 @@ PID class >> fields [
 PID >> patientId [
 
 	| fld |
-	fld:=(self at: 3)last .
-	^fld first.
+	fld := (self at: 3) last.
+	fld:= fld first select: [ :each | each isDigit ].
+	^ fld 
 ]
 
 { #category : 'printing' }

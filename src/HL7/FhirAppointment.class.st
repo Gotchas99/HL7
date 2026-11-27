@@ -5,7 +5,9 @@ Class {
 		'startTime',
 		'endTime',
 		'status',
-		'participants'
+		'participants',
+		'bookingApp',
+		'bookingId'
 	],
 	#category : 'HL7-FHIR',
 	#package : 'HL7',
@@ -49,19 +51,52 @@ FhirAppointment >> addPatient: personNr displayName: aString [
 { #category : 'converting' }
 FhirAppointment >> asDictionary [
 
-	| dict |
+	| dict  |
 	dict := super asDictionary.
 	dict
 		at: #status put: self status;
 		at: #start put: startTime;
 		at: #end put: endTime;
 		at: #participant put: participants.
+	bookingId ifNotNil: [ :x |
+	dict	at: #identifier put: self bookingIdentifier . ].
+	^ dict
+]
+
+{ #category : 'accessing' }
+FhirAppointment >> bookingApp: aHsaId [
+
+	bookingApp:=aHsaId 
+]
+
+{ #category : 'accessing' }
+FhirAppointment >> bookingId: anId [
+
+	bookingId:= anId
+
+	
+]
+
+{ #category : 'as yet unclassified' }
+FhirAppointment >> bookingIdentifier [
+
+	| dict |
+	dict := Dictionary new.
+	dict
+		at: #system put: bookingApp ;
+		at: #value put: bookingId .
 	^ dict
 ]
 
 { #category : 'accessing' }
 FhirAppointment >> duration:aDuration [
 endTime:=startTime + aDuration asInteger minutes
+]
+
+{ #category : 'accessing' }
+FhirAppointment >> endTime: aDateAndTime [
+
+	endTime :=DateAndTime readYMDHMSfromDigits: aDateAndTime txt readStream.
 ]
 
 { #category : 'initialization' }
@@ -74,9 +109,15 @@ FhirAppointment >> initialize [
 { #category : 'accessing' }
 FhirAppointment >> startTime: aDateAndTime [
 
-	startTime := DateAndTime fromString: aDateAndTime 
+	startTime := DateAndTime readYMDHMSfromDigits: aDateAndTime txt readStream.
 ]
 
 { #category : 'accessing' }
 FhirAppointment >> status [ ^status ifNil: [status:=#booked]
+]
+
+{ #category : 'accessing' }
+FhirAppointment >> status:aStatus [
+
+	status := aStatus 
 ]

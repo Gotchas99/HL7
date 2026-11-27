@@ -77,6 +77,12 @@ MSH >> sendingApplication [
 ]
 
 { #category : 'testing' }
+MSH >> sendingApplicationUID [
+
+	^ (self at: 3) last at: 2
+]
+
+{ #category : 'testing' }
 MSH >> trigger [
 
 	| fld |
